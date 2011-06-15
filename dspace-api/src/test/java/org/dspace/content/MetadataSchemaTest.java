@@ -7,15 +7,19 @@
  */
 package org.dspace.content;
 
+import mockit.NonStrictExpectations;
+import org.apache.log4j.Logger;
+import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import mockit.NonStrictExpectations;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.sql.SQLException;
-import org.dspace.AbstractUnitTest;
-import org.apache.log4j.Logger;
-import org.junit.*;
-import static org.junit.Assert.* ;
+
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class MetadataSchema
@@ -391,5 +395,4 @@ public class MetadataSchemaTest extends AbstractUnitTest
         found = MetadataSchema.find(context, null);
         assertThat("testFind_Context_String 4",found, nullValue());
     }
-
 }

@@ -107,6 +107,10 @@ CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
+CREATE SEQUENCE submissionprocess_seq;
+CREATE SEQUENCE submissionstep_seq;
+CREATE SEQUENCE role_seq;
+
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -771,9 +775,36 @@ CREATE TABLE harvested_item
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
 
+-------------------------------------------------------
+-- Create the submission-process tables
+-------------------------------------------------------
+-- list of the submission-processes,steps and actions
+-- list of roles
 
+-- Table: submissionprocess
 
+CREATE TABLE submissionprocess
+(
+  process_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionprocess_seq'),
+  name VARCHAR(64),
+  start_step_id INTEGER
+);
 
+CREATE TABLE submissionstep
+(
+  step_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionstep_seq'),
+  next_step_id INTEGER,
+  name VARCHAR(64),
+  selection_method_id INTEGER,
+  role_id INTEGER
+);
 
+CREATE TABLE role
+{
+ role_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('role_seq'),
+ name VARCHAR(64),
+ description VARCHAR(256),
+ scope INTEGER
+};
 
 

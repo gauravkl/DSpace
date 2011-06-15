@@ -7,36 +7,42 @@
  */
 package org.dspace;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.FileChannel;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.TimeZone;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import org.dspace.administer.RegistryImportException;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.content.NonUniqueMetadataException;
-import org.junit.*;
-import static org.junit.Assert.*;
-import mockit.*;
+import mockit.UsingMocksAndStubs;
 import org.apache.log4j.Logger;
 import org.dspace.administer.MetadataImporter;
+import org.dspace.administer.RegistryImportException;
 import org.dspace.administer.RegistryLoader;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.browse.MockBrowseCreateDAOOracle;
 import org.dspace.content.MetadataField;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.search.DSIndexer;
 import org.dspace.storage.rdbms.MockDatabaseManager;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.channels.FileChannel;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.TimeZone;
+
+import static org.junit.Assert.fail;
 
 
 
@@ -101,7 +107,7 @@ public class AbstractUnitTest
 
             //prepare the Dspace files
             URL origin = ClassLoader.getSystemResource("dspaceFolder");
-            File source = new File(origin.getPath());
+            File source = new File(URLDecoder.decode(origin.getPath(),"UTF-8"));
             File dspaceTmp = new File(testProps.getProperty("test.folder"));
             if (!dspaceTmp.exists())
             {
@@ -122,7 +128,7 @@ public class AbstractUnitTest
 
             //load the test configuration file
             URL configFile = AbstractUnitTest.class.getClassLoader().getResource(testProps.getProperty("test.config.file"));
-            ConfigurationManager.loadConfig(configFile.getPath());
+            ConfigurationManager.loadConfig(URLDecoder.decode(configFile.getPath(),"UTF-8"));
 
             //load the default registries. This assumes the temporal filesystem is working
             //and the in-memory DB in place
@@ -363,7 +369,7 @@ public class AbstractUnitTest
             
             //we clear the copied resources
             URL origin = ClassLoader.getSystemResource("dspaceFolder");
-            File source = new File(origin.getPath());
+            File source = new File(URLDecoder.decode(origin.getPath(),"UTF-8"));
             File dspaceTmp = new File(testProps.getProperty("test.folder"));
             deleteDir(source, dspaceTmp);
 

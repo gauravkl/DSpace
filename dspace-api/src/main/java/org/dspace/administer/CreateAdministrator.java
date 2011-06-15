@@ -7,21 +7,20 @@
  */
 package org.dspace.administer;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Locale;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Locale;
 
 /**
  * A command-line tool for creating an initial administrator for setting up a
@@ -218,7 +217,7 @@ public final class CreateAdministrator
      * @param email	the email for the user
      * @param first	user's first name
      * @param last	user's last name
-     * @param ps	desired password
+     * @param pw	desired password
      * 
      * @throws Exception
      */

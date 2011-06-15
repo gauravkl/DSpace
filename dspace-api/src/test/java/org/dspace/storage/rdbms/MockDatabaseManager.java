@@ -9,38 +9,6 @@ package org.dspace.storage.rdbms;
 
 import mockit.Mock;
 import mockit.MockClass;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import org.apache.commons.dbcp.ConnectionFactory;
 import org.apache.commons.dbcp.DriverManagerConnectionFactory;
 import org.apache.commons.dbcp.PoolableConnectionFactory;
@@ -49,10 +17,18 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericKeyedObjectPoolFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+
+import java.io.*;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Mocks a DatabaseManager so unit tests can be run without a real DB connection
@@ -1672,7 +1648,7 @@ public class MockDatabaseManager
             String s = new String();
             StringBuilder sb = new StringBuilder();
 
-            FileReader fr = new FileReader(new File(fileSchema.getPath()));
+            FileReader fr = new FileReader(new File(URLDecoder.decode(fileSchema.getPath())));
             BufferedReader br = new BufferedReader(fr);
 
             while((s = br.readLine()) != null)
