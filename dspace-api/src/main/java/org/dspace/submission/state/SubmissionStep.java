@@ -31,7 +31,7 @@ import java.util.Map;
 public class SubmissionStep {
 
     /** log4j logger */
-	    private static Logger log = Logger.getLogger(SubmissionStep.class);
+    private static Logger log = Logger.getLogger(SubmissionStep.class);
     private UserSelectionActionConfig userSelectionMethod;
     private HashMap<String, WorkflowActionConfig> actionConfigsMap;
     private List<String> actionConfigsList;

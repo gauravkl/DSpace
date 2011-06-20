@@ -55,7 +55,7 @@ public class CollectionRole {
         }
     }
 
-    public static CollectionRole find(Context context, int collection, String role) throws SQLException {
+    public static CollectionRole find(Context context, int collection, int role) throws SQLException {
          TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_collectionrole",
                 "SELECT * FROM xmlwf_collectionrole WHERE collection_id="+collection+" AND role_id= ? ",
                 role);

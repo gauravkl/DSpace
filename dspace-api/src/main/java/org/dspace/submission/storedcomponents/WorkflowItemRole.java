@@ -55,7 +55,7 @@ public class WorkflowItemRole {
         }
     }
 
-    public static WorkflowItemRole[] find(Context context, int workflowItemId, String role) throws SQLException {
+    public static WorkflowItemRole[] find(Context context, int workflowItemId, int role) throws SQLException {
          TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_workflowitemrole",
                 "SELECT * FROM xmlwf_workflowitemrole WHERE workflowitem_id= ? AND role_id= ? ",
                 workflowItemId, role);
