@@ -132,7 +132,6 @@ public class AbstractUnitTest
 
             //load the default registries. This assumes the temporal filesystem is working
             //and the in-memory DB in place
-            MockDatabaseManager.shutdown();
             Context ctx = new Context();
             ctx.turnOffAuthorisationSystem();
 

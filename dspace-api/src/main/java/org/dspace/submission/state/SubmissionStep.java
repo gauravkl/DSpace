@@ -35,7 +35,7 @@ public class SubmissionStep {
     private UserSelectionActionConfig userSelectionMethod;
     private HashMap<String, WorkflowActionConfig> actionConfigsMap;
     private List<String> actionConfigsList;
-    private Map<Integer, String> outcomes;
+    private Map<Integer, Integer> outcomes;
     private int step_id;
     private Role role;
     private SubmissionProcess submissionprocess;
@@ -46,7 +46,7 @@ public class SubmissionStep {
     // cache of process by ID (Integer)
     private static HashMap id2step = null;
 
-    public SubmissionStep(String name , Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, String> outcomes){
+    public SubmissionStep(String name , Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, Integer> outcomes){
         this.actionConfigsMap = new HashMap<String, WorkflowActionConfig>();
         this.outcomes = outcomes;
         this.userSelectionMethod = userSelectionMethod;
@@ -102,7 +102,7 @@ public class SubmissionStep {
         return false;
     }
 
-    public String getNextStepID(int outcome) //throws WorkflowException, IOException, WorkflowConfigurationException, SQLException
+    public int getNextStepID(int outcome) //throws WorkflowException, IOException, WorkflowConfigurationException, SQLException
     {
         return outcomes.get(outcome);
     }
@@ -282,20 +282,20 @@ public class SubmissionStep {
 	     * @return array of submissionactions
 	     * @throws SQLException
 	     */
-	    public static SubmissionAction[] findAll(Context context) throws SQLException
+	    public static SubmissionStep[] findAll(Context context) throws SQLException
 	    {
-	        List submissionactions = new ArrayList();
+	        List submissionsteps = new ArrayList();
 
 	        // Get all the SubmissionStep rows
 	        TableRowIterator tri = DatabaseManager.queryTable(context, "SubmissionStepRegistry",
-	                        "SELECT * FROM SubmissionStepRegistry ORDER BY action_id");
+	                        "SELECT * FROM SubmissionStepRegistry ORDER BY step_id");
 
 	        try
 	        {
 
 	            while (tri.hasNext())
 	            {
-	                submissionactions.add(new SubmissionStep(tri.next()));
+	                submissionsteps.add(new SubmissionStep(tri.next()));
 	            }
 	        }
 	        finally
@@ -306,8 +306,8 @@ public class SubmissionStep {
 	        }
 
 	        // Convert list into an array
-	        SubmissionAction[] typeArray = new SubmissionAction[submissionactions.size()];
-	        return (SubmissionAction[]) submissionactions.toArray(typeArray);
+	        SubmissionStep[] typeArray = new SubmissionStep[submissionsteps.size()];
+	        return (SubmissionStep[]) submissionsteps.toArray(typeArray);
 	    }
 
 

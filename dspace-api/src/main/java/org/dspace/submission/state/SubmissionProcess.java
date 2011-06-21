@@ -82,26 +82,27 @@ public class SubmissionProcess {
 	/*
 	 * Return a step with a given id
 	 */
-	public SubmissionStep getStep(String stepID) throws //WorkflowConfigurationException,
-	 IOException {
-		if(steps.get(stepID)!=null){
-			return steps.get(stepID);
-		}else{
+	public SubmissionStep getStep(Context context,int stepID) throws //WorkflowConfigurationException,
+	 IOException,SQLException {
+//		if(steps.get(stepID)!=null){
+//			return steps.get(stepID);
+//		}else{
 			//SubmissionStep step = WorkflowFactory.createStep(this, stepID);
 //			if(step== null){
 //				throw new WorkflowConfigurationException("SubmissionStep definition not found for: "+stepID);
 //			}
 			//steps.put(stepID, step);
 			//return step;
-            return null;
-		}
+//            return null;
+//		}
+        return SubmissionStep.find(context,stepID);
 	}
 
 	public SubmissionStep getNextStep(Context context, WorkspaceItem wfi, SubmissionStep currentStep, int outcome) throws IOException,// WorkflowConfigurationException, WorkflowException,
             SQLException {
-		String nextStepID = currentStep.getNextStepID(outcome);
+		Integer nextStepID = currentStep.getNextStepID(outcome);
 		if(nextStepID != null){
-			SubmissionStep nextStep = getStep(nextStepID);
+			SubmissionStep nextStep = getStep(context,nextStepID);
 //			if(nextStep == null)
 //				throw new WorkflowException("Error while processing outcome, the following action was undefined: " + nextStepID);
 			if(nextStep.isValidStep(context, wfi)){
@@ -309,7 +310,7 @@ public class SubmissionProcess {
                }
            }
 
-           public static void collection2process(Context context,int collectionID,int processID) throws SQLException,
+           public static void process2collection(Context context,int collectionID,int processID) throws SQLException,
            AuthorizeException
            {
                TableRow mappingRow = DatabaseManager.create(context,

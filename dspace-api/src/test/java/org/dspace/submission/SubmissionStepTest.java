@@ -3,7 +3,12 @@ package org.dspace.submission;
 import mockit.NonStrictExpectations;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.submission.state.SubmissionProcess;
 import org.dspace.submission.state.SubmissionStep;
 import org.junit.After;
 import org.junit.Before;
@@ -13,9 +18,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -51,17 +56,20 @@ public class SubmissionStepTest extends AbstractUnitTest {
         {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-
-
+            Map<Integer, Integer> outcomes = new HashMap<Integer, Integer>();
+            outcomes.put(0,123);
+            Role r = new Role("gauravinit","test",false,Role.Scope.COLLECTION);
+            step = new SubmissionStep("init-step",r,null,null,outcomes);
+            step.create(context);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
             context.commit();
         }
-//        catch (AuthorizeException ex)
-//        {
-//            log.error("Authorization Error in init", ex);
-//            fail("Authorization Error in init");
-//        }
+        catch (AuthorizeException ex)
+        {
+            log.error("Authorization Error in init", ex);
+            fail("Authorization Error in init");
+        }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
@@ -116,28 +124,117 @@ public class SubmissionStepTest extends AbstractUnitTest {
         };
 
         SubmissionStep step = new SubmissionStep();
-        Map<Integer, String> outcomes = new HashMap<Integer, String>();
-        outcomes.put(0,"123");
+        Map<Integer, Integer> outcomes = new HashMap<Integer, Integer>();
+        outcomes.put(0,123);
         Role r = new Role("gaurav","test",false,Role.Scope.COLLECTION);
-        SubmissionStep first = new SubmissionStep("name",r,null,null,outcomes);
-        first.create(context);
-        step.setName("test-step");
-        step.create(context);
-        fail("Exception expected");
-        SubmissionStep teststep = SubmissionStep.findByName(context,"test-step");
+        SubmissionStep s = new SubmissionStep("test-step-2",r,null,null,outcomes);
+        s.create(context);
+        s.setName("test-step-2");
+        //fail("Exception expected");
+        SubmissionStep teststep = SubmissionStep.findByName(context,"test-step-2");
         System.out.println(teststep.getName());
-        assertThat("TestCreate1",teststep.getName(),equalTo("test-step"));
+        assertThat("TestCreate1",teststep.getName(),equalTo("test-step-2"));
     }
 
     /**
-     * Test of find method, of class SubmissionStep.
+     * Test of XXXX method, of class <OriginalClass>
      */
+//    @Test
+//    public void testXXXX() throws Exception
+//    {
+//        int id = c.getID();
+//        <OriginalClass> found =  <OriginalClass>.find(context, id);
+//        assertThat("testXXXX 0", found, notNullValue());
+//        assertThat("testXXXX 1", found.getID(), equalTo(id));
+//        assertThat("testXXXX 2", found.getName(), equalTo(""));
+//    }
+
     @Test
-    public void testFind_Context_int() throws Exception
+       public void testGetName()
+       {
+           assertThat("testGetName 0",step.getName(),notNullValue());
+           assertThat("testGetName 1",step.getName(),not(equalTo("")));
+           assertThat("testGetName 2",step.getName(),(equalTo("init-process")));
+       }
+
+    @Test
+       public void testSetName()
+       {
+           String name = "new name";
+           step.setName(name);
+           assertThat("testSetName 0",step.getName(),notNullValue());
+           assertThat("testSetName 1",step.getName(),not(equalTo("")));
+           assertThat("testSetName 2",step.getName(),equalTo(name));
+       }
+
+       /**
+        * Test of getSchemaID method, of class MetadataSchema.
+        */
+    @Test
+    public void testGetID()
     {
-        int id = SubmissionStepTest.DEFAULT_ID;
-        SubmissionStep found = SubmissionStep.find(context, id);
-        assertThat("testFind_Context_int 0",found, notNullValue());
+       assertTrue("testGetSchemaID 0",step.getId()>=1);
     }
 
+
+//    @Test
+//    public void testGetStep() throws  Exception{
+//        SubmissionStep first = process.getFirstStep();
+//        SubmissionStep test = process.getStep(context,first.getId());
+//        assertThat("testGetStep 0", test, notNullValue());
+//        assertThat("testGetStep 1", test.getName(), notNullValue());
+//        assertThat("testGetStep 2", test.getName(), equalTo("test-step"));
+//    }
+
+    /**
+     * Test of findAll method, of class MetadataSchema.
+     */
+    @Test
+    public void testFindAll() throws Exception
+    {
+        SubmissionStep[] found = SubmissionStep.findAll(context);
+        assertThat("testFindAll 0",found, notNullValue());
+        assertTrue("testFindAll 1",found.length >= 1);
+
+        boolean added = false;
+        for(SubmissionStep p: found)
+        {
+            if(p.getName().equals(step.getName()))
+            {
+                added = true;
+            }
+        }
+        assertTrue("testFindAll 2",added);
+    }
+
+    @Test
+    public void testFind() throws Exception
+    {
+        int id = 1;
+        SubmissionStep found =  SubmissionStep.find(context, id);
+        assertThat("testItemFind 0", found, notNullValue());
+        assertThat("testItemFind 1", found.getId(), equalTo(id));
+        assertThat("testItemFind 2", found.getName(), equalTo("init-step"));
+    }
+
+    @Test(expected=AuthorizeException.class)
+    public void testDelete() throws Exception
+    {
+        new NonStrictExpectations()
+        {
+            AuthorizeManager authManager;
+            {
+                AuthorizeManager.authorizeAction((Context) any, (Item) any,
+                        Constants.REMOVE, true); result = null;
+            }
+        };
+
+        int id = step.getId();
+        step.delete(context);
+        SubmissionStep found = SubmissionStep.find(context, id);
+        assertThat("testDeleteAuth 0",found,nullValue());
+    }
 }
+    
+
+
