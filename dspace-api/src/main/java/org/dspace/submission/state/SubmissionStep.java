@@ -11,7 +11,6 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.submission.Role;
-import org.dspace.submission.state.actions.SubmissionAction;
 import org.dspace.submission.state.actions.UserSelectionActionConfig;
 import org.dspace.submission.state.actions.WorkflowActionConfig;
 
@@ -560,4 +559,5 @@ public class SubmissionStep {
 	                tri.close();
 	        }
 	    }
+
 }

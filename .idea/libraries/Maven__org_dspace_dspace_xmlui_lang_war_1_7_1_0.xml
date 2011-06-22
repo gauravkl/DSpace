@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.dspace:dspace-xmlui-lang:war:1.7.1.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/dspace/dspace-xmlui-lang/1.7.1.0/dspace-xmlui-lang-1.7.1.0.war!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/dspace/dspace-xmlui-lang/1.7.1.0/dspace-xmlui-lang-1.7.1.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/dspace/dspace-xmlui-lang/1.7.1.0/dspace-xmlui-lang-1.7.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

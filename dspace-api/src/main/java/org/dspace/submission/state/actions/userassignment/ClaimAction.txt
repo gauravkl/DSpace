@@ -1,0 +1,119 @@
+package org.dspace.xmlworkflow.state.actions.userassignment;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.*;
+import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.storedcomponents.WorkspaceItem;
+import org.dspace.xmlworkflow.*;
+import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: bram
+ * Date: 2-aug-2010
+ * Time: 17:37:55
+ * To change this template use File | Settings | File Templates.
+ */
+public class ClaimAction extends UserSelectionAction {
+    @Override
+    public void activate(Context context, WorkspaceItem wfItem) throws SQLException, IOException, AuthorizeException {
+        Step owningStep = getParent().getStep();
+
+        RoleMembers allroleMembers = getParent().getStep().getRole().getMembers(context, wfItem);
+        // Create pooled tasks for each member of our group
+        if(allroleMembers != null && (allroleMembers.getGroups().size() > 0 || allroleMembers.getEPersons().size() > 0)){
+            XmlWorkflowManager.createPoolTasks(context, wfItem, allroleMembers, owningStep, getParent());
+            alertUsersOnActivation(context, wfItem, allroleMembers);
+        }
+        else
+            log.info(LogManager.getHeader(context, "warning while activating claim action", "No group or person was found for the following roleid: " + getParent().getStep().getRole().getId()));
+
+
+    }
+
+    @Override
+    public ActionResult execute(Context c, WorkspaceItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+        if(request.getParameter("submit_take_task") != null){
+            //Add a claimed user to our task
+            WorkflowRequirementsManager.addClaimedUser(c, wfi, step, c.getCurrentUser());
+
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+        }else{
+            return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
+        }
+    }
+
+    @Override
+    public void alertUsersOnActivation(Context c, WorkspaceItem wfi, RoleMembers roleMembers) throws IOException, SQLException {
+        Email mail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "submit_task"));
+        mail.addArgument(wfi.getItem().getName());
+        mail.addArgument(wfi.getCollection().getName());
+        mail.addArgument(wfi.getSubmitter().getFullName());
+        //TODO: message
+        mail.addArgument("New task available.");
+        mail.addArgument(XmlWorkflowManager.getMyDSpaceLink());
+
+        try {
+            WorkflowUtils.emailRecipients(roleMembers.getAllUniqueMembers(c), mail);
+        } catch (MessagingException e) {
+            log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+        }
+    }
+
+    public void regenerateTasks(Context c, WorkspaceItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException {
+        if(roleMembers != null && (roleMembers.getEPersons().size() > 0 || roleMembers.getGroups().size() >0)){
+            //Create task for the users left
+            XmlWorkflowManager.createPoolTasks(c, wfi, roleMembers, getParent().getStep(), getParent());
+        }
+        else
+            log.info(LogManager.getHeader(c, "warning while activating claim action", "No group or person was found for the following roleid: " + getParent().getStep().getId()));
+
+    }
+
+    @Override
+    public boolean isFinished(WorkspaceItem wfi) {
+        return false;
+    }
+
+    public boolean isValidUserSelection(Context context, WorkspaceItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException {
+        //A user claim action always needs to have a UI, since somebody needs to be able to claim it
+        if(hasUI){
+            Step step = getParent().getStep();
+            //First of all check if our step has a role
+            Role role = step.getRole();
+            if(role != null){
+                //We have a role, check if we have a group to with that role
+                RoleMembers roleMembers = role.getMembers(context, wfi);
+
+                ArrayList<EPerson> epersons = roleMembers.getAllUniqueMembers(context);
+                //TODO: verify this constraint
+                if(epersons.size() == 0 || step.getRequiredUsers() > epersons.size()){
+                    //We don't have any members or our group is non existing
+                    //and thus the step is not valid
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                // We don't have a role and do have a UI so throw a workflow exception
+                throw new WorkflowConfigurationException("The next step is invalid, since it doesn't have a valid role");
+            }
+        }else
+            return true;
+
+    }
+
+    @Override
+    public boolean usesTaskPool() {
+        return true;
+    }
+
+}
