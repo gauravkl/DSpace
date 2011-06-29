@@ -794,6 +794,7 @@
 	<message key="xmlui.administrative.Navigation.context_create_collection">Create Collection</message>
 	<message key="xmlui.administrative.Navigation.context_create_subcommunity">Create Sub-community</message>
 	<message key="xmlui.administrative.Navigation.context_create_community">Create Community</message>
+    <message key="xmlui.administrative.Navigation.context_create_submissionprocess">Select/Edit Process</message>
 	<message key="xmlui.administrative.Navigation.context_export_item">Export Item</message>
         <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
         <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>

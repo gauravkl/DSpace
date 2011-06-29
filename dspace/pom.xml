@@ -83,6 +83,7 @@
         <!--
            Builds DSpace Solr Stats for DSpace
         -->
+<!--
         <profile>
             <id>dspace-stats</id>
             <activation>
@@ -94,10 +95,11 @@
                 <module>../dspace-stats</module>
             </modules>
         </profile>
-
+-->
         <!--
             Builds DSpace discovery for DSpace
         -->
+        <!--
         <profile>
             <id>dspace-discovery</id>
             <activation>
@@ -109,10 +111,11 @@
                 <module>../dspace-discovery</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds OAI Gateway WAR for DSpace
         -->
+        <!--
         <profile>
             <id>dspace-oai-api</id>
             <activation>
@@ -124,10 +127,11 @@
                 <module>../dspace-oai-api</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds OAI Gateway WAR for DSpace
         -->
+        <!--
         <profile>
             <id>dspace-oai-webapp</id>
             <activation>
@@ -139,10 +143,11 @@
                 <module>../dspace-oai-webapp</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds OAI Gateway WAR for DSpace
         -->
+        <!--
         <profile>
             <id>dspace-oai</id>
             <activation>
@@ -154,10 +159,11 @@
                 <module>../dspace-oai</module>
             </modules>
         </profile>
-
+ -->
         <!--
            Builds JSPUI WAR for DSpace
         -->
+        <!--
         <profile>
 
             <id>dspace-jspui-api</id>
@@ -170,10 +176,11 @@
                 <module>../dspace-jspui-api</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds JSPUI WAR for DSpace
         -->
+        <!--
         <profile>
 
             <id>dspace-jspui-webapp</id>
@@ -186,10 +193,11 @@
                 <module>../dspace-jspui-webapp</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds JSPUI WAR for DSpace
         -->
+         <!--
         <profile>
 
             <id>dspace-jspui</id>
@@ -202,10 +210,11 @@
                 <module>../dspace-jspui</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds SWORD WAR for DSpace
         -->
+        <!--
         <profile>
 
             <id>dspace-sword-api</id>
@@ -218,10 +227,11 @@
                 <module>../dspace-sword-api</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds SWORD WAR for DSpace
         -->
+         <!--
         <profile>
 
             <id>dspace-sword-webapp</id>
@@ -234,10 +244,11 @@
                 <module>../dspace-sword-webapp</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds SWORD WAR for DSpace
         -->
+        <!--
         <profile>
             <id>dspace-sword</id>
             <activation>
@@ -249,7 +260,7 @@
                 <module>../dspace-sword</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
         -->
@@ -319,6 +330,7 @@
         <!--
            Builds each separate LNI module for the LNI war (for development/Eclipse)
         -->
+        <!--
         <profile>
             <id>dspace-lni-core</id>
             <activation>
@@ -354,10 +366,11 @@
                 <module>../dspace-lni-client</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds LNI WAR for DSpace
         -->
+        <!--
         <profile>
             <id>dspace-lni</id>
             <activation>
@@ -369,10 +382,11 @@
                 <module>../dspace-lni</module>
             </modules>
         </profile>
-
+-->
         <!--
            Builds Language Packs for DSpace
         -->
+
         <profile>
             <id>dspace-api-lang</id>
             <activation>
@@ -503,6 +517,7 @@
     <!--
        Builds Overlay Modules for DSpace
     -->
+
     <modules>
         <module>modules</module>
     </modules>

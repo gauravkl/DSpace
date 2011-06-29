@@ -436,7 +436,21 @@ function startManageMetadataRegistry()
 	getDSContext().complete();
 	cocoon.exit();
 }
+/**
+ * Start managing the submission-process registry
+ */
+function startManageSubmissionProcess()
+{
+	assertAdministrator();
 
+	doManageSubmissionProcess();
+
+	// This should never return, but just in case it does then point
+	// the user to the home page.
+	cocoon.redirectTo(cocoon.request.getContextPath());
+	getDSContext().complete();
+	cocoon.exit();
+}
 /**
  * Start managing the format registry
  */
@@ -1034,7 +1048,47 @@ function doDeleteGroups(groupIDs)
     }
     return null;
 }
+/**************************
+ * Submission-Process Registry
+ **************************/
 
+/**
+ * Manage submission-processes. This flow will list all available processes for edit, allow
+ * the user to add or delete schemas.
+ *
+ * This is an entry point flow.
+ */
+function doManageSubmissionProcess()
+{
+	assertAdministrator();
+
+    var result = null;
+    do {
+        sendPageAndWait("admin/submissionprocess/main",{},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("submit_edit") && cocoon.request.get("processID"))
+        {
+            // Edit a specific schema
+            var processID = cocoon.request.get("processID");
+            result = doEditMetadataSchema(processID)
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new schema
+            var namespace = cocoon.request.get("namespace");
+            var name = cocoon.request.get("name");
+            result = FlowRegistryUtils.processAddMetadataSchema(getDSContext(), namespace, name);
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_schema"))
+        {
+            // Remove the selected schemas
+            var processIDs = cocoon.request.getParameterValues("select_schema");
+            result = doDeleteMetadataSchemas(schemaIDs)
+        }
+    } while(true)
+}
 
 /**************************
  * Registries: Metadata flows

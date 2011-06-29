@@ -7,11 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Map;
-
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -40,6 +35,11 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Map;
+
 /**
  * 
  * Create the navigation options for everything in the administrative aspects. This includes 
@@ -60,6 +60,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_create_collection 	= message("xmlui.administrative.Navigation.context_create_collection");
     private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
     private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
+    private static final Message T_context_create_submissionprocess	= message("xmlui.administrative.Navigation.context_create_submissionprocess");
     private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
     private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
     private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
@@ -197,7 +198,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         List context = options.addList("context");
         List admin = options.addList("administrative");
         account.setHead(T_my_account);	        
-        
+
         // My Account options
         if(availableExports!=null && availableExports.size()>0){
             account.addItem().addXref(contextPath+"/admin/export", T_account_export);
@@ -260,7 +261,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
-                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);      
+                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);
             }
     	}
     	
@@ -270,7 +271,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             context.setHead(T_context_head);
             context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
     	}
-        
+         if (isSystemAdmin)
+    	{
+            context.setHead(T_context_head);
+            context.addItemXref(contextPath+"/admin/submissionprocess", T_context_create_submissionprocess);
+    	}
         
         // System Administrator options!
         if (isSystemAdmin)
@@ -281,9 +286,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	        List registries = admin.addList("registries");
 	        
 	        epeople.setHead(T_administrative_access_control);	        
-	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);	        
-	        epeople.addItemXref(contextPath+"/admin/groups", T_administrative_groups);	        
-	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_authorizations);	        
+	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);
+	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_groups);
+	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_groups);
 	        
 	        registries.setHead(T_administrative_registries);	        
 	        registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);	        
@@ -352,8 +357,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
             options++;
     	}
-    	
-    	return options;
+
+       	return options;
     }
     
     
