@@ -1082,6 +1082,25 @@
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_2">Support</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.submit_delete">Delete formats</message>
 
+    <!-- org.dspace.app.xmlui.administrative.submissionprocess.CreateProcessMain.java -->
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.title">Submission Process</message>
+    <message key="xmlui.administrative.submissionprocess.CreateProcessMain.trail">Submission Process</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.head1">Submission Process</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.para1">The Submission Process maintains a list of steps in the process. </message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column1"></message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column2">ID</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column3">Namespace</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column4">Name</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.submit_delete">Delete process</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.head2">Add a new process</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.namespace">Namespace</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.namespace_help">Namespace should be an established URI location for the new schema.</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.namespace_error">This field is required.</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name">Name</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name_help">Shorthand notation for the schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.submit_add">Add new process</message>
+
 	<!-- org.dspace.app.xmlui.administrative.registries.MetadatRegistryMain.java -->
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.title">Metadata Registry</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.head1">Metadata registry</message>

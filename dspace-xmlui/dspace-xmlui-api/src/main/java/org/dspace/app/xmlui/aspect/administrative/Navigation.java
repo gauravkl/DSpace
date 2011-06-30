@@ -287,8 +287,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	        
 	        epeople.setHead(T_administrative_access_control);	        
 	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);
-	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_groups);
-	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_groups);
+	        epeople.addItemXref(contextPath+"/admin/groups", T_administrative_groups);
+	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_authorizations);
 	        
 	        registries.setHead(T_administrative_registries);	        
 	        registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);	        

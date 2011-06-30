@@ -76,12 +76,12 @@
          <modules>
             <module>dspace-api</module>
 		<module>dspace-xmlui</module>	
-            <!--<module>dspace-stats</module>
+            <module>dspace-stats</module>
             <module>dspace-discovery</module>
             <module>dspace-jspui</module>           
             <module>dspace-lni</module>
             <module>dspace-oai</module>
-            <module>dspace-sword</module>-->
+            <module>dspace-sword</module>
             <module>dspace</module>
             
          </modules>
@@ -100,7 +100,7 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-xmlui</module>
-             <!--
+
             <module>dspace-stats</module>
             <module>dspace-discovery</module>
             <module>dspace-jspui</module>
@@ -108,7 +108,7 @@
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
-            -->
+            
          </modules>
       </profile>
 

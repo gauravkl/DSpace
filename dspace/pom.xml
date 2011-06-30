@@ -517,8 +517,7 @@
     <!--
        Builds Overlay Modules for DSpace
     -->
-
-    <modules>
+       <modules>
         <module>modules</module>
     </modules>
 

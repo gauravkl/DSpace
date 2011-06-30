@@ -31,26 +31,26 @@ public class CreateProcessMain extends AbstractDSpaceTransformer {
 	/** Language strings */
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-	private static final Message T_title = message("xmlui.administrative.submissionprocess.general.title");
-	private static final Message T_head1 = message("xmlui.administrative.submissionprocess.general.head1");
+	private static final Message T_title = message("xmlui.administrative.submissionprocess.CreateProcessMain.general.title");
+	private static final Message T_head1 = message("xmlui.administrative.submissionprocess.CreateProcessMain.head1");
         private static final Message T_submit_upload = message("xmlui.administrative.submissionprocess.CreateProcessMain.submit_upload");
-        private static final Message T_trail = message("xmlui.administrative.submissionprocess.general.trail");
+        private static final Message T_trail = message("xmlui.administrative.submissionprocess.CreateProcessMain.general.trail");
     private static final Message T_head2 =
-		message("xmlui.administrative.submissionprocess.head2");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.head2");
 	private static final Message T_namespace =
-		message("xmlui.administrative.submissionprocess.namespace");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.namespace");
 	private static final Message T_namespace_help =
-		message("xmlui.administrative.submissionprocess.namespace_help");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.namespace_help");
 	private static final Message T_namespace_error =
-		message("xmlui.administrative.submissionprocess.namespace_error");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.namespace_error");
 	private static final Message T_name =
-		message("xmlui.administrative.submissionprocess.name");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.name");
 	private static final Message T_name_help =
-		message("xmlui.administrative.submissionprocess.name_help");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.name_help");
 	private static final Message T_name_error =
-		message("xmlui.administrative.submissionprocess.name_error");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.name_error");
 	private static final Message T_submit_add =
-		message("xmlui.administrative.submissionprocess.submit_add");
+		message("xmlui.administrative.submissionprocess.CreateProcessMain.submit_add");
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException  
 	{
@@ -75,19 +75,6 @@ public class CreateProcessMain extends AbstractDSpaceTransformer {
 		newProcess.setHead(T_head2);
 
 		List form = newProcess.addList("new-process",List.TYPE_FORM);
-
-		Text namespace = form.addItem().addText("namespace");
-		namespace.setLabel(T_namespace);
-		namespace.setRequired();
-		namespace.setHelp(T_namespace_help);
-		if (namespaceValue != null)
-        {
-            namespace.setValue(namespaceValue);
-        }
-//		if (errors.contains("namespace"))
-//        {
-//            namespace.addError(T_namespace_error);
-//        }
 
 		Text name = form.addItem().addText("name");
 		name.setLabel(T_name);
