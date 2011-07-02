@@ -760,6 +760,12 @@
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">The user(s) listed were not deleted because there are constraints preventing them from being deleted, see the eperson detail page for more information.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.edit_group_success_notice">The group was edited successfully.</message>
 	<message key="xmlui.administrative.FlowGroupUtils.delete_group_success_notice">The selected groups were deleted successfully.</message>
+    <message key="xmlui.administrative.FlowRegistryUtils.add_
+    _success_notice">New process has been successfully created.</message>
+	<message key="xmlui.administrative.FlowRegistryUtils.delete_submissionprocess_success_notice">The process(es) were successfully deleted.</message>
+    <message key="xmlui.administrative.FlowRegistryUtils.delete_submissionstep_success_notice">The step(s) were successfully deleted.</message>
+    <message key="xmlui.administrative.FlowRegistryUtils.add_submissionprocess_success_notice">New process has been successfully created.</message>
+    <message key="xmlui.administrative.FlowRegistryUtils.add_submissionstep_success_notice">New step has been successfully created.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_schema_success_notice">New schema has been successfully created.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.delete_metadata_schema_success_notice">The schema(s) were successfully deleted.</message>
 	<message key="xmlui.administrative.FlowRegistryUtils.add_metadata_field_success_notice">Metadata field successfully added.</message>
@@ -1089,17 +1095,57 @@
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.para1">The Submission Process maintains a list of steps in the process. </message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column1"></message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column2">ID</message>
-	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column3">Namespace</message>
-	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column4">Name</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.column3">Name</message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.submit_delete">Delete process</message>
+    <message key="xmlui.administrative.submissionprocess.CreateProcessMain.submit_assign">Assign process</message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.head2">Add a new process</message>
-	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.namespace">Namespace</message>
-	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.namespace_help">Namespace should be an established URI location for the new schema.</message>
-	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.namespace_error">This field is required.</message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name">Name</message>
-	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name_help">Shorthand notation for the schema. This will be used to prefix a field's name (e.g. dc.element.qualifier). The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name_help">Name for the process.  The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.submit_add">Add new process</message>
+
+    <!-- org.dspace.app.xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.java-->
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.title">Delete process</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.trail">Delete process</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.head">Confirm Deletion</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.para1">Are you <b>absolutely</b> sure you want to delete this process?If it contains any steps it cannot be deleted.</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.warning">WARNING: </message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.para2"></message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.column1">ID</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionProcessConfirm.column2">Name</message>
+
+     <!-- org.dspace.app.xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.java-->
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.title">Delete step</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.trail">Delete step</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.head">Confirm Deletion</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.para1">Are you <b>absolutely</b> sure you want to delete this step?</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.warning">WARNING: </message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.para2"></message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.column1">ID</message>
+	<message key="xmlui.administrative.submissionprocess.DeleteSubmissionStepConfirm.column2">Name</message>
+
+<!-- org.dspace.app.xmlui.administrative.submissionprocess.EditSubmissionProcess.java -->
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.title">SubmissionProcess</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.trail">SubmissionProcess</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.head1">SubmissionProcess: "{0}"</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.para1">This is the SubmissionProcess for "{0}". You may add new or update existing steps to this process. Steps may also be selected for deletion . </message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.head2">Steps</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.column1"></message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.column2">ID</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.column3">Steps</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.empty">No steps</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_delete">Delete steps</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_move">Move steps to another process</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.head3">Add new step</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.name">step Name</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.note">Scope Note</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.note_help">Additional notes about this step.</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_add">Add new step</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.head4">Update step: {0}</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_update">Update step</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.error">Error</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.error_duplicate_step">The step name is already in use</message>
+
 
 	<!-- org.dspace.app.xmlui.administrative.registries.MetadatRegistryMain.java -->
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.title">Metadata Registry</message>

@@ -3,7 +3,6 @@ package org.dspace.submission.state;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -34,7 +33,7 @@ public class SubmissionStep {
     private UserSelectionActionConfig userSelectionMethod;
     private HashMap<String, WorkflowActionConfig> actionConfigsMap;
     private List<String> actionConfigsList;
-    private Map<Integer, Integer> outcomes;
+    private Map<Integer, Integer> outcomes = new HashMap<Integer, Integer>();
     private int step_id;
     private Role role;
     private SubmissionProcess submissionprocess;
@@ -210,9 +209,9 @@ public class SubmissionStep {
 	        // Create a table row and update it with the values
 	        row = DatabaseManager.create(context, "submissionstep");
 	        row.setColumn("name", name);
-            row.setColumn("next_step_id",getNextStepID(0));
-            row.setColumn("role_id",role.getId());
-            row.setColumn("selection__method_id",userSelectionMethod.getId());
+           // row.setColumn("next_step_id",getNextStepID(0));
+            //row.setColumn("role_id",role.getId());
+            //row.setColumn("selection__method_id",userSelectionMethod.getId());
 	        DatabaseManager.update(context, row);
 
 	        // Remember the new row number
@@ -376,15 +375,14 @@ public class SubmissionStep {
 	        }
 	    }
 
-	    public static void process2step(Context context,int collectionID,int step_id) throws SQLException,
+	    public static void step2submissionprocess(Context context,int processID,int step_id) throws SQLException,
 	    AuthorizeException
 	    {
 	        TableRow mappingRow = DatabaseManager.create(context,
-	        "process2step");
-	        mappingRow.setColumn("collection_id", collectionID);
+	        "step2submissionprocess");
+	        mappingRow.setColumn("process_id", processID);
 	        mappingRow.setColumn("step_id", step_id);
 	        DatabaseManager.update(context, mappingRow);
-
 	    }
 	 // invalidate the cache e.g. after something modifies DB state.
 	    private static void decache()
@@ -509,25 +507,24 @@ public class SubmissionStep {
 //	        return (SubmissionAction[]) steps.toArray(typeArray);
 //	    }
 
-		public static Collection getCollection(Context context,int step_id)
+		public SubmissionProcess getProcess(Context context)
 	            throws SQLException
 	     {
-	        Collection collection=null ;
+	        SubmissionProcess process=null ;
 
-	        // Get all the process2step rows
-	        TableRowIterator tri = DatabaseManager.queryTable(context,"process2step",
-	                "SELECT * FROM process2step WHERE step_id= ? ",step_id);
+	        // Get all the step2submissionprocess rows
+	        TableRowIterator tri = DatabaseManager.queryTable(context,"step2submissionprocess",
+	                "SELECT * FROM step2submissionprocess WHERE step_id= ? ",step_id);
 
 	        try
 	        {
 	            // get Collection objects
 	            while (tri.hasNext())
-	            {   int id=tri.next().getIntColumn("collection_id");
-	                System.out.println("collID"+id);
-	                collection=Collection.find(context,id);
-			}
+	            {   int id=tri.next().getIntColumn("process_id");
+	                process=SubmissionProcess.find(context,id);
+			    }
 
-		  }
+		    }
 	        finally
 	        {
 	            // close the TableRowIterator to free up resources
@@ -536,7 +533,7 @@ public class SubmissionStep {
 	        }
 
 	        // Convert list into an array
-	        return  collection;
+	        return  process;
 	    }
 
 	public static void removeAction(Context context,int actionID,int step_id) throws SQLException,

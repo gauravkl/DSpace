@@ -7,13 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.RequestUtils;
 import org.dspace.app.xmlui.utils.UIException;
@@ -25,6 +18,15 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.submission.state.SubmissionProcess;
+import org.dspace.submission.state.SubmissionStep;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -33,10 +35,18 @@ public class FlowRegistryUtils
 {
 
 	/** Language Strings */
+    private static final Message T_add_submissionprocess_success_notice =
+		new Message("default","xmlui.administrative.FlowRegistryUtils.add_submissionprocess_success_notice");
+    private static final Message T_delete_submissionprocess_success_notice =
+            new Message("default","xmlui.administrative.FlowRegistryUtils.delete_submissionprocess_success_notice");
+    private static final Message T_delete_submissionstep_success_notice =
+             new Message("default","xmlui.administrative.FlowRegistryUtils.delete_submissionstep_success_notice");
 	private static final Message T_add_metadata_schema_success_notice =
 		new Message("default","xmlui.administrative.FlowRegistryUtils.add_metadata_schema_success_notice");
 	private static final Message T_delete_metadata_schema_success_notice =
 		new Message("default","xmlui.administrative.FlowRegistryUtils.delete_metadata_schema_success_notice");
+    private static final Message T_add_submissionstep_success_notice =
+            new Message("default","xmlui.administrative.FlowRegistryUtils.add_submissionstep_success_notice");
 	private static final Message T_add_metadata_field_success_notice =
 		new Message("default","xmlui.administrative.FlowRegistryUtils.add_metadata_field_success_notice");
 	private static final Message T_edit_metadata_field_success_notice =
@@ -51,11 +61,186 @@ public class FlowRegistryUtils
 		new Message("default","xmlui.administrative.FlowRegistryUtils.delete_bitstream_format_success_notice");
 
 	
-	
+	/**
+	 * Add a new submission-process. The ID of the new process will be added
+	 * as the "processID" parameter on the results object.
+	 * 
+	 * @param context The DSpace context
+	 * @param namespace The new schema's namespace
+	 * @param name The new schema's name.
+	 * @return A flow result
+	 */
+	public static FlowResult processAddSubmissionProcess(Context context,String name) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+
+		// Decode the name
+		try
+        {
+           name = URLDecoder.decode(name,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
+
+
+		if (name == null ||
+			name.length() <= 0 ||
+			name.indexOf('.') != -1 ||
+			name.indexOf('_') != -1 ||
+			name.indexOf(' ') != -1)
+        {
+            // The name must not be empty nor contain dot, underscore or spaces.
+            result.addError("name");
+        }
+
+
+		if (result.getErrors() == null)
+		{
+			SubmissionProcess process = new SubmissionProcess();
+		    process.setName(name);
+		    process.create(context);
+
+		    context.commit();
+
+		    result.setContinue(true);
+		    result.setOutcome(true);
+		    result.setMessage(T_add_submissionprocess_success_notice);
+		    result.setParameter("processID", process.getID());
+		}
+
+		return result;
+	}
+    public static FlowResult processAddSubmissionStep(Context context,int processID,String name) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+        //SubmissionProcess process = SubmissionProcess.find(context, Integer.valueOf(processID));
+		// Decode the name
+		try
+        {
+           name = URLDecoder.decode(name,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
+
+
+		if (name == null ||
+			name.length() <= 0 ||
+			name.indexOf('.') != -1 ||
+			name.indexOf('_') != -1 ||
+			name.indexOf(' ') != -1)
+        {
+            // The name must not be empty nor contain dot, underscore or spaces.
+            result.addError("name");
+        }
+
+
+		if (result.getErrors() == null)
+		{
+			SubmissionStep step = new SubmissionStep();
+		    step.setName(name);
+		    step.create(context);
+            SubmissionProcess.addStep(context,processID,step.getId());
+		    context.commit();
+
+		    result.setContinue(true);
+		    result.setOutcome(true);
+		    result.setMessage(T_add_submissionstep_success_notice);
+		    result.setParameter("stepID", step.getId());
+		}
+
+		return result;
+	}
+
+        /**
+	 * Delete the given schemas.
+	 *
+	 * @param context The DSpace context
+	 * @param schemaIDs A list of schema IDs to be deleted.
+	 * @return A flow result
+	 */
+	public static FlowResult processDeleteSubmissionProcesses(Context context, String[] processIDs) throws SQLException, AuthorizeException, NonUniqueMetadataException
+	{
+		FlowResult result = new FlowResult();
+
+		int count = 0;
+		for (String id : processIDs)
+    	{
+			SubmissionProcess process = SubmissionProcess.find(context, Integer.valueOf(id));
+
+//			// First remove and fields in the schema
+//			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+//			for (MetadataField field : fields)
+//            {
+//				field.delete(context);
+//            }
+
+			// Once all the fields are gone, then delete the schema.
+	        process.delete(context);
+	        count++;
+    	}
+
+		if (count > 0)
+		{
+			context.commit();
+
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_delete_submissionprocess_success_notice);
+		}
+
+		return result;
+	}
+
+      /**
+	 * Delete the given schemas.
+	 *
+	 * @param context The DSpace context
+	 * @param schemaIDs A list of schema IDs to be deleted.
+	 * @return A flow result
+	 */
+	public static FlowResult processDeleteSubmissionSteps(Context context, String[] stepIDs) throws SQLException, AuthorizeException, NonUniqueMetadataException
+	{
+		FlowResult result = new FlowResult();
+
+		int count = 0;
+		for (String id : stepIDs)
+    	{
+			SubmissionStep step = SubmissionStep.find(context, Integer.valueOf(id));
+
+//			// First remove and fields in the schema
+//			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+//			for (MetadataField field : fields)
+//            {
+//				field.delete(context);
+//            }
+
+			// Once all the fields are gone, then delete the schema.
+            SubmissionProcess.removeStep(context,step.getProcess(context).getID(),step.getId());
+	        step.delete(context);
+	        count++;
+    	}
+
+		if (count > 0)
+		{
+			context.commit();
+
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_delete_submissionstep_success_notice);
+		}
+
+		return result;
+	}
 	/**
 	 * Add a new metadata schema. The ID of the new schema will be added
 	 * as the "schemaID" parameter on the results object.
-	 * 
+	 *
 	 * @param context The DSpace context
 	 * @param namespace The new schema's namespace
 	 * @param name The new schema's name.
@@ -109,6 +294,7 @@ public class FlowRegistryUtils
 		
 		return result;
 	}
+
 	
 	/**
 	 * Delete the given schemas.

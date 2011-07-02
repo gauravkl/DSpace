@@ -517,10 +517,11 @@
     <!--
        Builds Overlay Modules for DSpace
     -->
+<!--
        <modules>
         <module>modules</module>
     </modules>
-
+-->
     <build>
         <plugins>
             <!--  overall project assembly -->

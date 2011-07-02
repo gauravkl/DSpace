@@ -147,7 +147,8 @@ public class SubmissionProcess {
 
 			// Create a table row and update it with the values
 			row = DatabaseManager.create(context, "submissionprocess");
-            row.setColumn("start_step_id",firstStep.getId());
+            if(firstStep!=null)
+                row.setColumn("start_step_id",firstStep.getId());
             row.setColumn("name",name);
 			DatabaseManager.update(context, row);
 
@@ -455,5 +456,11 @@ public class SubmissionProcess {
                    if (tri != null)
                        tri.close();
                }
+           }
+     public static void addStep(Context context,int processID,int stepID) throws SQLException,
+           AuthorizeException
+           {
+           SubmissionStep.step2submissionprocess(context,processID,stepID);
+
            }
 }

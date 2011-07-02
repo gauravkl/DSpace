@@ -108,6 +108,7 @@ CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
 CREATE SEQUENCE submissionprocess_seq;
+CREATE SEQUENCE step2submissionprocess_seq;
 CREATE SEQUENCE submissionstep_seq;
 CREATE SEQUENCE role_seq;
 
@@ -800,11 +801,16 @@ CREATE TABLE submissionstep
 );
 
 CREATE TABLE role
-{
+(
  role_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('role_seq'),
  name VARCHAR(64),
  description VARCHAR(256),
  scope INTEGER
-};
+);
 
-
+CREATE TABLE step2submissionprocess
+(
+  id        INTEGER PRIMARY KEY,
+  step_id   INTEGER REFERENCES submissionstep(step_id),
+  process_id INTEGER REFERENCES submissionprocess(process_id)
+);

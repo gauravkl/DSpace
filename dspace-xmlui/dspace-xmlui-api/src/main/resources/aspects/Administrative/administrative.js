@@ -1072,24 +1072,142 @@ function doManageSubmissionProcess()
         {
             // Edit a specific schema
             var processID = cocoon.request.get("processID");
-            result = doEditMetadataSchema(processID)
+            result = doEditSubmissionProcess(processID)
         }
         else if (cocoon.request.get("submit_add"))
         {
             // Add a new schema
-            var namespace = cocoon.request.get("namespace");
             var name = cocoon.request.get("name");
-            result = FlowRegistryUtils.processAddMetadataSchema(getDSContext(), namespace, name);
+            result = FlowRegistryUtils.processAddSubmissionProcess(getDSContext(), name);
         }
-        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_schema"))
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_process"))
         {
             // Remove the selected schemas
-            var processIDs = cocoon.request.getParameterValues("select_schema");
-            result = doDeleteMetadataSchemas(schemaIDs)
+            var processIDs = cocoon.request.getParameterValues("select_process");
+            result = doDeleteSubmissionProcesses(processIDs)
         }
     } while(true)
 }
 
+/**
+ * Confirm the deletition of the listed schema
+ */
+function doDeleteSubmissionProcesses(processIDs)
+{
+	assertAdministrator();
+
+    sendPageAndWait("admin/submissionprocess/delete-processes",{"processIDs":processIDs.join(',')});
+    assertAdministrator();
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        // Actualy delete the schemas
+        var result = FlowRegistryUtils.processDeleteSubmissionProcesses(getDSContext(),processIDs)
+        return result;
+    }
+    return null;
+}
+
+/**
+ * Edit a particular schema, this will list all fields in the schema. When clicking
+ * on a field it will be loaded into the top of the page where it can be edited. When
+ * the top form is not loaded it can be used to add new fields.
+ *
+ * The last field operated on is kept as a highlighted field to make it easier to
+ * find things in the interface.
+ */
+function doEditSubmissionProcess(processID)
+{
+	assertAdministrator();
+
+    var highlightID = -1 // Field that is highlighted
+    var updateID = -1; // Field being updated
+    var result = null;
+    do {
+        sendPageAndWait("admin/submissionprocess/edit-process",{"processID":processID,"updateID":updateID,"highlightID":highlightID},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("submit_return"))
+        {
+            // Go back to where ever they came from.
+            return null;
+        }
+        else if (cocoon.request.get("submit_edit") && cocoon.request.get("fieldID"))
+        {
+            // select an existing field for editing. This will load it into the
+            // form for editing.
+            updateID = cocoon.request.get("fieldID");
+            highlightID = updateID;
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new field
+            var name = cocoon.request.get("name");
+             // processes adding field
+            result = FlowRegistryUtils.processAddSubmissionStep(getDSContext(),processID,name);
+            highlightID = result.getParameter("stepID");
+        }
+        else if (cocoon.request.get("submit_update") && updateID >= 0)
+        {
+            // Update an exiting field
+            var element = cocoon.request.get("updateElement");
+            var qualifier = cocoon.request.get("updateQualifier");
+            var note = cocoon.request.get("updateNote");
+
+            result = FlowRegistryUtils.processEditMetadataField(getDSContext(),processID,updateID,element,qualifier,note);
+
+            if (result != null && result.getContinue())
+            {
+                // If the update was successfull then clean the updateID;
+                highlightID = updateID;
+                updateID = -1;
+            }
+        }
+        else if (cocoon.request.get("submit_cancel"))
+        {
+            // User cancels out of a field update
+            updateID = -1;
+            highlightID = -1;
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_step"))
+        {
+            // Delete the selected steps
+            var stepIDs = cocoon.request.getParameterValues("select_step");
+            result = doDeleteSubmissionSteps(stepIDs);
+            updateID = -1;
+            highlightID = -1
+        }
+        else if (cocoon.request.get("submit_move") && cocoon.request.get("select_field"))
+        {
+            // Attempt to move the selected fields to another schema.
+            var fieldIDs = cocoon.request.getParameterValues("select_field");
+            result = doMoveMetadataFields(fieldIDs);
+            updateID = -1;
+            highlightID = -1;
+        }
+
+    } while (true)
+}
+
+/**
+ * Confirm the deletition of the listed schema
+ */
+function doDeleteSubmissionSteps(stepIDs)
+{
+	assertAdministrator();
+
+    sendPageAndWait("admin/submissionprocess/delete-steps",{"stepIDs":stepIDs.join(',')});
+    assertAdministrator();
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        // Actualy delete the schemas
+        var result = FlowRegistryUtils.processDeleteSubmissionSteps(getDSContext(),stepIDs)
+        return result;
+    }
+    return null;
+}
 /**************************
  * Registries: Metadata flows
  **************************/
