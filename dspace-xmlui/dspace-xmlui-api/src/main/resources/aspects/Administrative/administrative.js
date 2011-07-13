@@ -499,6 +499,21 @@ function startManageAuthorizations()
 	cocoon.exit();
 }
 
+/**
+ * Start managing the submission-process registry
+ */
+function startManageRoles()
+{
+	assertAdministrator();
+
+	doManageRoles();
+
+	// This should never return, but just in case it does then point
+	// the user to the home page.
+	cocoon.redirectTo(cocoon.request.getContextPath());
+	getDSContext().complete();
+	cocoon.exit();
+}
 
 /**
  * Start editing an individual item.
@@ -1064,6 +1079,7 @@ function doManageSubmissionProcess()
 
     var result = null;
     do {
+        sendPageAndWait("admin/roles/main",{},result);
         sendPageAndWait("admin/submissionprocess/main",{},result);
 		assertAdministrator();
         result = null;
@@ -1133,12 +1149,14 @@ function doEditSubmissionProcess(processID)
             // Go back to where ever they came from.
             return null;
         }
-        else if (cocoon.request.get("submit_edit") && cocoon.request.get("fieldID"))
+        else if (cocoon.request.get("submit_edit") && cocoon.request.get("stepID"))
         {
             // select an existing field for editing. This will load it into the
             // form for editing.
-            updateID = cocoon.request.get("fieldID");
+            updateID = cocoon.request.get("stepID");
+            //stepID = cocoon.request.get("stepID");
             highlightID = updateID;
+             result = doEditSubmissionStep(updateID)
         }
         else if (cocoon.request.get("submit_add"))
         {
@@ -1189,6 +1207,107 @@ function doEditSubmissionProcess(processID)
 
     } while (true)
 }
+function doEditSubmissionStep(stepID)
+{
+	assertAdministrator();
+
+    var highlightID = -1 // Field that is highlighted
+    var updateID = -1; // Field being updated
+    var result = null;
+    do {
+        sendPageAndWait("admin/submissionprocess/edit-step",{"stepID":stepID,"updateID":updateID,"highlightID":highlightID},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("submit_return"))
+        {
+            // Go back to where ever they came from.
+            return null;
+        }
+        else if (cocoon.request.get("submit_edit"))
+        {
+            // select an existing field for editing. This will load it into the
+            // form for editing.
+            updateID = stepID;
+            highlightID = updateID;
+             result = doManageSubmissionAction(stepID)
+//             sendPageAndWait("admin/submissionprocess/edit-process",{"stepID":stepID,"updateID":updateID,"highlightID":highlightID},result);
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new field
+            var name = cocoon.request.get("name");
+             // processes adding field
+            result = FlowRegistryUtils.processAddSubmissionStep(getDSContext(),stepID,name);
+            highlightID = result.getParameter("stepID");
+        }
+
+    } while (true)
+}
+
+function doManageSubmissionAction(stepID)
+{
+	assertAdministrator();
+
+    var highlightID = -1 // Field that is highlighted
+    var updateID = -1; // Field being updated
+    var result = null;
+    do {
+        sendPageAndWait("admin/submissionprocess/manage-action",{"stepID":stepID,"updateID":updateID,"highlightID":highlightID},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("edit_outcome"))
+        {
+            // Edit a specific schema
+            result = doEditOutcome(stepID)
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new action
+            var action = cocoon.request.get("action_list");
+            result = FlowRegistryUtils.processAddSubmissionAction(getDSContext(), action);
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_process"))
+        {
+            // Remove the selected schemas
+            var processIDs = cocoon.request.getParameterValues("select_process");
+            result = doDeleteSubmissionProcesses(processIDs)
+        }
+    } while(true)
+}
+
+function doEditOutcome(stepID)
+{
+    assertAdministrator();
+
+    var highlightID = -1 // Field that is highlighted
+    var updateID = -1; // Field being updated
+    var result = null;
+    do {
+        sendPageAndWait("admin/submissionprocess/edit-outcome",{"stepID":stepID,"updateID":updateID,"highlightID":highlightID},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("edit_outcome"))
+        {
+            // Edit a specific schema
+            result = doEditOutcome(stepID)
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new schema
+            var name = cocoon.request.get("name");
+            result = FlowRegistryUtils.processAddSubmissionProcess(getDSContext(), name);
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_process"))
+        {
+            // Remove the selected schemas
+            var processIDs = cocoon.request.getParameterValues("select_process");
+            result = doDeleteSubmissionProcesses(processIDs)
+        }
+    } while(true)
+}
 
 /**
  * Confirm the deletition of the listed schema
@@ -1207,6 +1326,105 @@ function doDeleteSubmissionSteps(stepIDs)
         return result;
     }
     return null;
+}
+
+function doManageRoles()
+{
+	assertAdministrator();
+    var highlightID = -1 // Field that is highlighted
+    var updateID = -1; // Field being updated
+    var result = null;
+    do {
+        sendPageAndWait("admin/roles/main",{},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("submit_edit") && cocoon.request.get("roleID"))
+        {
+            // Edit a specific role
+            updateID = cocoon.request.get("roleID");
+            highlightID = updateID;
+        }
+        else if (cocoon.request.get("submit_add"))
+        {
+            // Add a new schema
+            var name = cocoon.request.get("name");
+            var description = cocoon.request.get("description");
+            var scope = cocoon.request.get("scope");
+            result = FlowRegistryUtils.processAddRole(getDSContext(), name,description,scope);
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_role"))
+        {
+            // Remove the selected schemas
+            var roleIDs = cocoon.request.getParameterValues("select_role");
+            result = doDeleteRoles(roleIDs)
+        }
+    } while(true)
+}
+
+function doDeleteRoles(roleIDs)
+{
+	assertAdministrator();
+
+    sendPageAndWait("admin/roles/delete-roles",{"roleIDs":roleIDs.join(',')});
+    assertAdministrator();
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        // Actualy delete the schemas
+        var result = FlowRegistryUtils.processDeleteRoles(getDSContext(),roleIDs)
+        return result;
+    }
+    return null;
+}
+
+function doEditRole(roleID)
+{
+	assertAdministrator();
+
+    var highlightID = -1 // Field that is highlighted
+    var updateID = -1; // Field being updated
+    var result = null;
+    do {
+        sendPageAndWait("admin/roles/edit-role",{"roleID":roleID,"updateID":updateID,"highlightID":highlightID},result);
+		assertAdministrator();
+        result = null;
+
+        if (cocoon.request.get("submit_return"))
+        {
+            // Go back to where ever they came from.
+            return null;
+        }
+        else if (cocoon.request.get("submit_update") && updateID >= 0)
+        {
+            // Update an exiting field
+            var name = cocoon.request.get("name");
+            var description = cocoon.request.get("description");
+            var scope = cocoon.request.get("scope");
+            result = FlowRegistryUtils.processEditRole(getDSContext(),roleID,updateID, name,description,scope);
+
+            if (result != null && result.getContinue())
+            {
+                // If the update was successfull then clean the updateID;
+                highlightID = updateID;
+                updateID = -1;
+            }
+        }
+        else if (cocoon.request.get("submit_cancel"))
+        {
+            // User cancels out of a field update
+            updateID = -1;
+            highlightID = -1;
+        }
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_role"))
+        {
+            // Delete the selected fields
+            var roleIDs = cocoon.request.getParameterValues("select_role");
+            result = doDeleteMetadataFields(roleIDs);
+            updateID = -1;
+            highlightID = -1
+        }
+    } while (true)
 }
 /**************************
  * Registries: Metadata flows

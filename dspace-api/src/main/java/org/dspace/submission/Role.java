@@ -15,7 +15,9 @@ import org.dspace.submission.storedcomponents.CollectionRole;
 import org.dspace.submission.storedcomponents.WorkflowItemRole;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -30,7 +32,7 @@ public class Role {
     private String name;
     private String description;
     private boolean isInternal;
-    private Scope scope;
+    private int scope;
     private TableRow row;
 
  // cache of process by ID (Integer)
@@ -42,7 +44,11 @@ public class Role {
         ITEM
     }
 
-    public Role(String name, String description, boolean isInternal, Scope scope){
+    public Role(){
+        
+    }
+
+    public Role(String name, String description, boolean isInternal, int scope){
         this.name = name;
         this.description = description;
         this.isInternal = isInternal;
@@ -51,10 +57,10 @@ public class Role {
     public Role(TableRow row){
 		if (row != null)
 		{
-		  this.id = row.getIntColumn("process_id");
+		  this.id = row.getIntColumn("role_id");
           this.name = row.getStringColumn("name");
           this.description = row.getStringColumn("description");
-          this.scope = Scope.valueOf(row.getStringColumn("scope"));
+          this.scope =row.getIntColumn("scope");
 		  this.row = row;
 		}
 	}
@@ -77,16 +83,26 @@ public class Role {
         return description;
     }
 
+    public void setDescription(String description)
+	    {
+	        this.description = description;
+	    }
+
     public boolean isInternal() {
         return isInternal;
     }
 
-    public Scope getScope() {
+    public int getScope() {
         return scope;
     }
 
+    public void setScope(int scope)
+	    {
+	        this.scope = scope;
+	    }
+
     public RoleMembers getMembers(Context context, WorkspaceItem wfi) throws SQLException {
-        if(scope == Scope.REPOSITORY){
+        if(scope == 0){
             Group group = Group.findByName(context, name);
             if(group == null)
                 return new RoleMembers();
@@ -96,7 +112,7 @@ public class Role {
                 return assignees;
             }
         } else
-        if(scope == Scope.COLLECTION){
+        if(scope == 1){
             CollectionRole collectionRole = CollectionRole.find(context,wfi.getCollection().getID(),id);
             if(collectionRole != null){
                 RoleMembers assignees =  new RoleMembers();
@@ -134,7 +150,7 @@ public class Role {
 			row = DatabaseManager.create(context, "role");
             row.setColumn("description",description);
             row.setColumn("name",name);
-            row.setColumn("scope",scope.toString());
+            row.setColumn("scope",scope);
 			DatabaseManager.update(context, row);
 
 			// Remember the new row number
@@ -159,7 +175,7 @@ public class Role {
 			// Create a table row and update it with the values
 			row.setColumn("description",description);
             row.setColumn("name",name);
-            row.setColumn("scope",scope.toString());
+            row.setColumn("scope",scope);
 			DatabaseManager.update(context, row);
 
 			log
@@ -195,6 +211,34 @@ public class Role {
 
                return (Role) id2role.get(iid);
            }
+    
+    public static Role[] findAll(Context context) throws SQLException
+	    {
+	        List roles = new ArrayList();
+
+	        // Get all the Role rows
+	        TableRowIterator tri = DatabaseManager.queryTable(context, "Role",
+	                        "SELECT * FROM Role ORDER BY role_id");
+
+	        try
+	        {
+
+	            while (tri.hasNext())
+	            {
+	                roles.add(new Role(tri.next()));
+	            }
+	        }
+	        finally
+	        {
+	            // close the TableRowIterator to free up resources
+	            if (tri != null)
+	                tri.close();
+	        }
+
+	        // Convert list into an array
+	        Role[] typeArray = new Role[roles.size()];
+	        return (Role[]) roles.toArray(typeArray);
+	    }
     private static void decache()
               {
                   id2role = null;

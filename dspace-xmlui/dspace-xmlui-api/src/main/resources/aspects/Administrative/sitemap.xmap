@@ -58,7 +58,10 @@ to administer DSpace.
 			<map:transformer name="ManageGroupsMain" src="org.dspace.app.xmlui.aspect.administrative.group.ManageGroupsMain"/>
 			<map:transformer name="EditGroupForm" src="org.dspace.app.xmlui.aspect.administrative.group.EditGroupForm"/>
 			<map:transformer name="DeleteGroupsConfirm" src="org.dspace.app.xmlui.aspect.administrative.group.DeleteGroupsConfirm"/>
-			
+
+            <map:transformer name="CreateRoleMain" src="org.dspace.app.xmlui.aspect.administrative.role.CreateRoleMain"/>
+            <map:transformer name="DeleteRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.role.DeleteRoleConfirm"/>
+            
 			<map:transformer name="MetadataRegistryMain" src="org.dspace.app.xmlui.aspect.administrative.registries.MetadataRegistryMain"/>
 			<map:transformer name="EditMetadataSchema" src="org.dspace.app.xmlui.aspect.administrative.registries.EditMetadataSchema"/>
 			<map:transformer name="DeleteMetadataSchemaConfirm" src="org.dspace.app.xmlui.aspect.administrative.registries.DeleteMetadataSchemaConfirm"/>
@@ -123,9 +126,11 @@ to administer DSpace.
 
 		<map:transformer name="CreateProcessMain" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.CreateProcessMain"/>
 		<map:transformer name="EditSubmissionProcess" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.EditSubmissionProcess"/>
+        <map:transformer name="EditSubmissionStep" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.EditSubmissionStep"/>
 		<map:transformer name="DeleteSubmissionProcessConfirm" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.DeleteSubmissionProcessConfirm"/>
         <map:transformer name="DeleteSubmissionStepConfirm" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.DeleteSubmissionStepConfirm"/>
-
+        <map:transformer name="ManageAction" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.ManageAction"/>
+        <map:transformer name="EditOutcome" src="org.dspace.app.xmlui.aspect.administrative.submissionprocess.EditOutcome"/>
 
 		</map:transformers>
 		
@@ -177,6 +182,17 @@ to administer DSpace.
 							<map:call continuation="{1}"/>
 						</map:match>
 						<map:call function="startManageGroups"/>
+					</map:match>
+
+					<!--
+						This is the general entry / resume point for the
+						managment of all roles.
+						-->
+					<map:match pattern="admin/roles">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+						<map:call function="startManageRoles"/>
 					</map:match>
 
 					<!--
@@ -451,6 +467,22 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
 
+		        	<!-- Role Registry pages -->
+
+                        <map:match pattern="admin/roles/main">
+		        			<map:transform type="CreateRoleMain">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+
+		        		<map:match pattern="admin/roles/delete-roles">
+		        			<map:transform type="DeleteRoleConfirm">
+		        				<map:parameter name="roleIDs" value="{flow-attribute:roleIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+
+		        		
+
 		        	<!-- Submission Process Registry pages -->
 
                         <map:match pattern="admin/submissionprocess/main">
@@ -485,6 +517,33 @@ to administer DSpace.
 		        		<map:match pattern="admin/submissionprocess/delete-steps">
 		        			<map:transform type="DeleteSubmissionStepConfirm">
 		        				<map:parameter name="stepIDs" value="{flow-attribute:stepIDs}"/>
+		        			</map:transform>
+		        		</map:match>
+
+		        		<map:match pattern="admin/submissionprocess/edit-step">
+		        			<map:transform type="EditSubmissionStep">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        				<map:parameter name="stepID" value="{flow-attribute:stepID}"/>
+		        				<map:parameter name="updateID" value="{flow-attribute:updateID}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+
+		        		<map:match pattern="admin/submissionprocess/manage-action">
+		        			<map:transform type="ManageAction">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        				<map:parameter name="stepID" value="{flow-attribute:stepID}"/>
+		        				<map:parameter name="updateID" value="{flow-attribute:updateID}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
+		        			</map:transform>
+		        		</map:match>
+
+		        		<map:match pattern="admin/submissionprocess/edit-outcome">
+		        			<map:transform type="EditOutcome">
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        				<map:parameter name="stepID" value="{flow-attribute:stepID}"/>
+		        				<map:parameter name="updateID" value="{flow-attribute:updateID}"/>
+		        				<map:parameter name="highlightID" value="{flow-attribute:highlightID}"/>
 		        			</map:transform>
 		        		</map:match>
 

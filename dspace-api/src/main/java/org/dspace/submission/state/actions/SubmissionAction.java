@@ -9,10 +9,7 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.submission.Role;
 import org.dspace.submission.RoleMembers;
-import org.dspace.submission.state.SubmissionStep;
-
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -31,7 +28,7 @@ import java.util.List;
 public class SubmissionAction {
     
     /** log4j logger */
-    private static Logger log = Logger.getLogger(SubmissionStep.class);    
+    private static Logger log = Logger.getLogger(SubmissionAction.class);
     private WorkflowActionConfig parent;
     private TableRow row;
     
@@ -46,7 +43,7 @@ public class SubmissionAction {
     {
         if (row != null)
         {
-          this.action_id = row.getIntColumn("step_id");
+          this.action_id = row.getIntColumn("action_id");
           this.bean_id= row.getStringColumn("bean_id");
           this.row = row;
         }
@@ -251,26 +248,26 @@ public class SubmissionAction {
 	    }
 
 	    /**
-	     * Return all submissionsteps.
+	     * Return all submissionactions.
 	     *
 	     * @param context DSpace context
 	     * @return array of submissionactions
 	     * @throws SQLException
 	     */
-	    public static SubmissionStep[] findAll(Context context) throws SQLException
+	    public static SubmissionAction[] findAll(Context context) throws SQLException
 	    {
-	        List submissionsteps = new ArrayList();
+	        List submissionactions = new ArrayList();
 
-	        // Get all the SubmissionStep rows
-	        TableRowIterator tri = DatabaseManager.queryTable(context, "SubmissionStepRegistry",
-	                        "SELECT * FROM SubmissionStepRegistry ORDER BY action_id");
+	        // Get all the SubmissionAction rows
+	        TableRowIterator tri = DatabaseManager.queryTable(context, "SubmissionAction",
+	                        "SELECT * FROM SubmissionAction ORDER BY action_id");
 
 	        try
 	        {
 
 	            while (tri.hasNext())
 	            {
-	                submissionsteps.add(new SubmissionStep(tri.next()));
+	                submissionactions.add(new SubmissionAction(tri.next()));
 	            }
 	        }
 	        finally
@@ -281,35 +278,10 @@ public class SubmissionAction {
 	        }
 
 	        // Convert list into an array
-	        SubmissionStep[] typeArray = new SubmissionStep[submissionsteps.size()];
-	        return (SubmissionStep[]) submissionsteps.toArray(typeArray);
+	        SubmissionAction[] typeArray = new SubmissionAction[submissionactions.size()];
+	        return (SubmissionAction[]) submissionactions.toArray(typeArray);
 	    }
 
-
-
-	    /**
-	     * Get the submissionaction corresponding with this numeric ID.
-	     * The ID is a database key internal to DSpace.
-	     *
-	     * @param context
-	     *            context, in case we need to read it in from DB
-	     * @param id
-	     *            the submissionaction ID
-	     * @return the submissionaction object
-	     * @throws SQLException
-	     */
-//	    public static SubmissionStep find(Context context, int id)
-//	            throws SQLException
-//	    {   decache();
-//	        initCache(context);
-//	        Integer iid = new Integer(id);
-//
-//	        // sanity check
-//	        if (!id2action.containsKey(iid))
-//	            return null;
-//
-//	        return (SubmissionStep) id2action.get(iid);
-//	    }
      public static SubmissionAction findByBean(Context context,
 	            String bean_id) throws SQLException
 	    {
@@ -340,6 +312,65 @@ public class SubmissionAction {
 	        else
 	        {
 	            return new SubmissionAction(row);
+	        }
+	    }
+      public static SubmissionAction find(Context context, int id)
+	            throws SQLException
+	    {   decache();
+	        initCache(context);
+	        Integer iid = new Integer(id);
+
+	        // sanity check
+	        if (!id2action.containsKey(iid))
+	            return null;
+
+	        return (SubmissionAction) id2action.get(iid);
+	    }
+	   
+	 // invalidate the cache e.g. after something modifies DB state.
+	    private static void decache()
+	    {
+	        id2action = null;
+
+	    }
+
+	    // load caches if necessary
+	    private static void initCache(Context context) throws SQLException
+	    {
+	        if (id2action != null )
+	            return;
+
+	        synchronized (SubmissionAction.class)
+	        {
+	            if (id2action == null )
+	            {
+	                log.info("Loading form cache for fast finds");
+	                HashMap new_id2action = new HashMap();
+
+	                TableRowIterator tri = DatabaseManager.queryTable(context,"SubmissionAction",
+	                        "SELECT * from SubmissionAction");
+
+	                try
+	                {
+	                    while (tri.hasNext())
+	                    {
+	                        TableRow row = tri.next();
+
+	                        SubmissionAction action = new SubmissionAction(row);
+	                        new_id2action.put(new Integer(action.action_id), action);
+
+	                    }
+	                }
+	                finally
+	                {
+	                    // close the TableRowIterator to free up resources
+	                    if (tri != null)
+	                        tri.close();
+	                }
+
+	                id2action = new_id2action;
+
+	            }
 	        }
 	    }
 }

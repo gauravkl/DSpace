@@ -811,6 +811,7 @@
 	<message key="xmlui.administrative.Navigation.administrative_access_control">Access Control</message>
 	<message key="xmlui.administrative.Navigation.administrative_people">People</message>
 	<message key="xmlui.administrative.Navigation.administrative_groups">Groups</message>
+    <message key="xmlui.administrative.Navigation.administrative_roles">Roles</message>
 	<message key="xmlui.administrative.Navigation.administrative_authorizations">Authorizations</message>
 	<message key="xmlui.administrative.Navigation.administrative_registries">Registries</message>
 	<message key="xmlui.administrative.Navigation.administrative_metadata">Metadata</message>
@@ -1088,6 +1089,22 @@
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_2">Support</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.submit_delete">Delete formats</message>
 
+    <!-- org.dspace.app.xmlui.administrative.role.CreateRoleMain.java -->
+	<message key="xmlui.administrative.role.CreateRoleMain.title">Role</message>
+    <message key="xmlui.administrative.role.CreateRoleMain.trail">Role</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.head1">Role</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.column1"></message>
+	<message key="xmlui.administrative.role.CreateRoleMain.column2">ID</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.column3">Name</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.submit_delete">Delete role</message>
+    <message key="xmlui.administrative.role.CreateRoleMain.head2">Add a new role</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.name">Name</message>
+    <message key="xmlui.administrative.role.CreateRoleMain.description">Description</message>
+    <message key="xmlui.administrative.role.CreateRoleMain.scope">Scope</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.name_help">Name for the role.  The name must be less than 32 characters and cannot include spaces, periods or underscores.</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.name_error">This field is required and must be less than 32 characters and cannot contain any spaces, periods, or underscores.</message>
+	<message key="xmlui.administrative.role.CreateRoleMain.submit_add">Add new role</message>
+
     <!-- org.dspace.app.xmlui.administrative.submissionprocess.CreateProcessMain.java -->
 	<message key="xmlui.administrative.submissionprocess.CreateProcessMain.title">Submission Process</message>
     <message key="xmlui.administrative.submissionprocess.CreateProcessMain.trail">Submission Process</message>
@@ -1145,6 +1162,72 @@
 	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_update">Update step</message>
 	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.error">Error</message>
 	<message key="xmlui.administrative.submissionprocess.EditSubmissionProcess.error_duplicate_step">The step name is already in use</message>
+
+
+    <!-- org.dspace.app.xmlui.administrative.submissionprocess.EditSubmissionStep.java -->
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.title">SubmissionStep</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.trail">SubmissionStep</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.head1">SubmissionStep: "{0}"</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.para1">This is the SubmissionStep for "{0}". You may add new or update existing steps to this process. Steps may also be selected for deletion . </message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.head2">Steps</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.column1"></message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.column2">ID</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.column3">Steps</message>
+    <message key="xmlui.administrative.submissionprocess.EditSubmissionStep.userselection_method">User Selection Method</message>
+    <message key="xmlui.administrative.submissionprocess.EditSubmissionStep.role">Role</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.empty">No steps</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.submit_delete">Delete steps</message>
+    <message key="xmlui.administrative.submissionprocess.EditSubmissionStep.submit_edit">Manage Actions</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.submit_move">Move steps to another process</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.head3">Add new step</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.name">step Name</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.note">Scope Note</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.note_help">Additional notes about this step.</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.submit_add">Add new step</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.head4">Update step: {0}</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.submit_update">Update step</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.error">Error</message>
+	<message key="xmlui.administrative.submissionprocess.EditSubmissionStep.error_duplicate_step">The step name is already in use</message>
+
+    <!-- org.dspace.app.xmlui.administrative.submissionprocess.ManageAction.java -->
+	<message key="xmlui.administrative.submissionprocess.ManageAction.title">Manage action</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.trail">Manage action</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.head1">Manage action: "{0}"</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.head2">actions</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.column1"></message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.column2">ID</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.column3">Actions</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.empty">No actions</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.submit_delete">Delete actions</message>
+    <message key="xmlui.administrative.submissionprocess.ManageAction.edit_outcome">Edit Outcomes</message>
+    <message key="xmlui.administrative.submissionprocess.ManageAction.submit_edit">Manage Actions</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.submit_move">Move actions to another process</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.head3">Add new action</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.name">Action Name</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.submit_add">Add new action</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.head4">Update action: {0}</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.submit_update">Update action</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.error">Error</message>
+	<message key="xmlui.administrative.submissionprocess.ManageAction.error_duplicate_step">The action name is already in use</message>
+
+    <!-- org.dspace.app.xmlui.administrative.submissionprocess.EditOutcome.java -->
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.title">Edit outcome</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.trail">Edit outcome</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.head1">Edit outcome: "{0}"</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.column1"></message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.column2">Outcome ID</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.column3">Steps</message>
+    <message key="xmlui.administrative.submissionprocess.EditOutcome.status">Status Code</message>        
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.submit_delete">Delete outcome</message>
+    <message key="xmlui.administrative.submissionprocess.EditOutcome.submit_edit">Manage outcome</message>
+    <message key="xmlui.administrative.submissionprocess.EditOutcome.save_outcome">Save Outcome</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.head3">Add new outcome</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.name">Step Name</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.note">Scope Note</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.submit_add">Add new outcome</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.head4">Update outcome: {0}</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.submit_update">Update outcome</message>
+	<message key="xmlui.administrative.submissionprocess.EditOutcome.error">Error</message>
 
 
 	<!-- org.dspace.app.xmlui.administrative.registries.MetadatRegistryMain.java -->

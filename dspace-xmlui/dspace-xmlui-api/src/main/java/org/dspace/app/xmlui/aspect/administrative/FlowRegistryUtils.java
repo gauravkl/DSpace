@@ -18,6 +18,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.submission.Role;
 import org.dspace.submission.state.SubmissionProcess;
 import org.dspace.submission.state.SubmissionStep;
 
@@ -70,6 +71,85 @@ public class FlowRegistryUtils
 	 * @param name The new schema's name.
 	 * @return A flow result
 	 */
+    public static FlowResult processAddRole(Context context,String name,String description,String scope) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+
+		// Decode the name
+		try
+        {
+           name = URLDecoder.decode(name,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
+
+
+		if (name == null ||
+			name.length() <= 0 ||
+			name.indexOf('.') != -1 ||
+			name.indexOf('_') != -1 ||
+			name.indexOf(' ') != -1)
+        {
+            // The name must not be empty nor contain dot, underscore or spaces.
+            result.addError("name");
+        }
+
+
+		if (result.getErrors() == null)
+		{
+			Role role = new Role();
+		    role.setName(name);
+            role.setDescription(description);
+            role.setScope(Integer.valueOf(scope));
+		    role.create(context);
+
+		    context.commit();
+
+		    result.setContinue(true);
+		    result.setOutcome(true);
+		    result.setMessage(T_add_submissionprocess_success_notice);
+		    result.setParameter("roleID", role.getId());
+		}
+
+		return result;
+	}
+
+    public static FlowResult processDeleteRoles(Context context, String[] roleIDS) throws SQLException, AuthorizeException, NonUniqueMetadataException
+	{
+		FlowResult result = new FlowResult();
+
+		int count = 0;
+		for (String id : roleIDS)
+    	{
+			Role role = Role.find(context, Integer.valueOf(id));
+
+//			// First remove and fields in the schema
+//			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+//			for (MetadataField field : fields)
+//            {
+//				field.delete(context);
+//            }
+
+			// Once all the fields are gone, then delete the schema.
+	        role.delete(context);
+	        count++;
+    	}
+
+		if (count > 0)
+		{
+			context.commit();
+
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_delete_submissionprocess_success_notice);
+		}
+
+		return result;
+	}
+
 	public static FlowResult processAddSubmissionProcess(Context context,String name) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
 	{
 		FlowResult result = new FlowResult();
@@ -157,6 +237,49 @@ public class FlowRegistryUtils
 		return result;
 	}
 
+     public static FlowResult processAddSubmissionAction(Context context,int stepID,String action) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+        //SubmissionProcess process = SubmissionProcess.find(context, Integer.valueOf(processID));
+		// Decode the action
+		try
+        {
+           action = URLDecoder.decode(action,Constants.DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new UIException(uee);
+        }
+
+
+		if (action == null ||
+			action.length() <= 0 ||
+			action.indexOf('.') != -1 ||
+			action.indexOf('_') != -1 ||
+			action.indexOf(' ') != -1)
+        {
+            // The name must not be empty nor contain dot, underscore or spaces.
+            result.addError("action");
+        }
+
+
+		if (result.getErrors() == null)
+		{
+			SubmissionStep step = new SubmissionStep();
+		    step.setName(action);
+		    step.create(context);
+            //SubmissionStep.addAction(context,  step.getId());
+		    context.commit();
+
+		    result.setContinue(true);
+		    result.setOutcome(true);
+		    result.setMessage(T_add_submissionstep_success_notice);
+		    result.setParameter("stepID", step.getId());
+		}
+
+		return result;
+	}
         /**
 	 * Delete the given schemas.
 	 *

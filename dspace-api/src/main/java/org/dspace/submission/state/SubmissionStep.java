@@ -10,6 +10,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.submission.Role;
+import org.dspace.submission.state.actions.SubmissionAction;
 import org.dspace.submission.state.actions.UserSelectionActionConfig;
 import org.dspace.submission.state.actions.WorkflowActionConfig;
 
@@ -285,8 +286,8 @@ public class SubmissionStep {
 	        List submissionsteps = new ArrayList();
 
 	        // Get all the SubmissionStep rows
-	        TableRowIterator tri = DatabaseManager.queryTable(context, "SubmissionStepRegistry",
-	                        "SELECT * FROM SubmissionStepRegistry ORDER BY step_id");
+	        TableRowIterator tri = DatabaseManager.queryTable(context, "SubmissionStep",
+	                        "SELECT * FROM SubmissionStep ORDER BY step_id");
 
 	        try
 	        {
@@ -475,37 +476,37 @@ public class SubmissionStep {
 	     * @throws SQLException
 	     */
 
-//	    public static SubmissionAction[] getActions(Context context,int step_id)
-//	            throws SQLException
-//	    {
-//	        List steps = new ArrayList();
-//
-//	        // Get all the step2action rows
-//	        TableRowIterator tri = DatabaseManager.queryTable(context,"step2action",
-//	                "SELECT * FROM step2action WHERE step_id= ? " +
-//	                " ORDER BY step_id",step_id);
-//
-//	        try
-//	        {
-//	            // get Page objects
-//	            while (tri.hasNext())
-//	            {   int id=tri.next().getIntColumn("action_id");
-//	                //System.out.println("pageID"+id);
-//	                steps.add(SubmissionAction.find(context,id));
-//	            }
-//			log.info("length"+steps.size());
-//	        }
-//	        finally
-//	        {
-//	            // close the TableRowIterator to free up resources
-//	            if (tri != null)
-//	                tri.close();
-//	        }
-//
-//	        // Convert list into an array
-//	        SubmissionStep[] typeArray = new SubmissionStep[steps.size()];
-//	        return (SubmissionAction[]) steps.toArray(typeArray);
-//	    }
+	    public static SubmissionAction[] getActions(Context context,int step_id)
+	            throws SQLException
+	    {
+	        List actions = new ArrayList();
+
+	        // Get all the action2submissionstep rows
+	        TableRowIterator tri = DatabaseManager.queryTable(context,"action2submissionstep",
+	                "SELECT * FROM action2submissionstep WHERE step_id= ? " +
+	                " ORDER BY step_id",step_id);
+
+	        try
+	        {
+	            // get Page objects
+	            while (tri.hasNext())
+	            {   int id=tri.next().getIntColumn("action_id");
+	                //System.out.println("pageID"+id);
+	                actions.add(SubmissionAction.find(context,id));
+	            }
+			log.info("length"+actions.size());
+	        }
+	        finally
+	        {
+	            // close the TableRowIterator to free up resources
+	            if (tri != null)
+	                tri.close();
+	        }
+
+	        // Convert list into an array
+	        SubmissionAction[] typeArray = new SubmissionAction[actions.size()];
+	        return (SubmissionAction[]) actions.toArray(typeArray);
+	    }
 
 		public SubmissionProcess getProcess(Context context)
 	            throws SQLException
@@ -539,8 +540,8 @@ public class SubmissionStep {
 	public static void removeAction(Context context,int actionID,int step_id) throws SQLException,
 	    AuthorizeException
 	    {
-	        TableRowIterator tri = DatabaseManager.queryTable(context,"step2action",
-	                "SELECT * FROM step2action WHERE step_id= ? " +
+	        TableRowIterator tri = DatabaseManager.queryTable(context,"action2submissionstep",
+	                "SELECT * FROM action2submissionstep WHERE step_id= ? " +
 	                " AND action_id=?",step_id,actionID);
 		 try
 	        {

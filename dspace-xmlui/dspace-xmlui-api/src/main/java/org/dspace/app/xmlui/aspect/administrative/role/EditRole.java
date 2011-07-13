@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.administrative.submissionprocess;
+package org.dspace.app.xmlui.aspect.administrative.role;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -14,91 +14,90 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.content.MetadataField;
-import org.dspace.submission.state.SubmissionProcess;
-import org.dspace.submission.state.SubmissionStep;
+import org.dspace.content.MetadataSchema;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * Edit a metadata process by: listing all the existing fields in
- * the process, prompt the user to add a new field. If a current
+ * Edit a metadata schema by: listing all the existing fields in
+ * the schema, prompt the user to add a new field. If a current
  * field is selected then the field may be updated in the same
  * place where new field addition would be.
  * 
  * @author Scott Phillips
  */
-public class EditSubmissionProcess extends AbstractDSpaceTransformer
+public class EditRole extends AbstractDSpaceTransformer   
 {	
 	
 	/** Language Strings */
 	private static final Message T_dspace_home =
 		message("xmlui.general.dspace_home");
 	private static final Message T_title =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.title");
+		message("xmlui.administrative.registries.EditRole.title");
 	private static final Message T_metadata_registry_trail =
-		message("xmlui.administrative.submissionprocess.general.metadata_registry_trail");
+		message("xmlui.administrative.registries.general.metadata_registry_trail");
 	private static final Message T_trail =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.trail");	
+		message("xmlui.administrative.registries.EditRole.trail");	
 	private static final Message T_head1 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.head1");	
+		message("xmlui.administrative.registries.EditRole.head1");	
 	private static final Message T_para1 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.para1");	
+		message("xmlui.administrative.registries.EditRole.para1");	
 	private static final Message T_head2 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.head2");	
+		message("xmlui.administrative.registries.EditRole.head2");	
 	private static final Message T_column1 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.column1");	
+		message("xmlui.administrative.registries.EditRole.column1");	
 	private static final Message T_column2 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.column2");	
+		message("xmlui.administrative.registries.EditRole.column2");	
 	private static final Message T_column3 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.column3");	
+		message("xmlui.administrative.registries.EditRole.column3");	
 	private static final Message T_column4 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.column4");	
+		message("xmlui.administrative.registries.EditRole.column4");	
 	private static final Message T_empty =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.empty");	
+		message("xmlui.administrative.registries.EditRole.empty");	
 	private static final Message T_submit_return =
 		message("xmlui.general.return");	
 	private static final Message T_submit_delete =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_delete");	
+		message("xmlui.administrative.registries.EditRole.submit_delete");	
 	private static final Message T_submit_move =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_move");	
+		message("xmlui.administrative.registries.EditRole.submit_move");	
 	private static final Message T_head3 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.head3");	
+		message("xmlui.administrative.registries.EditRole.head3");	
 	private static final Message T_name =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.name");	
+		message("xmlui.administrative.registries.EditRole.name");	
 	private static final Message T_note =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.note");	
+		message("xmlui.administrative.registries.EditRole.note");	
 	private static final Message T_note_help =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.note_help");
+		message("xmlui.administrative.registries.EditRole.note_help");
 	private static final Message T_submit_add =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_add");	
+		message("xmlui.administrative.registries.EditRole.submit_add");	
 	private static final Message T_head4 =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.head4");
+		message("xmlui.administrative.registries.EditRole.head4");
 	private static final Message T_submit_update =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.submit_update");
+		message("xmlui.administrative.registries.EditRole.submit_update");
 	private static final Message T_submit_cancel =
 		message("xmlui.general.cancel");
 	private static final Message T_error =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error");	
+		message("xmlui.administrative.registries.EditRole.error");	
 	private static final Message T_error_duplicate_field =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error_duplicate_field");	
+		message("xmlui.administrative.registries.EditRole.error_duplicate_field");	
 	private static final Message T_error_element_empty =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error_element_empty");	
+		message("xmlui.administrative.registries.EditRole.error_element_empty");	
 	private static final Message T_error_element_badchar =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error_element_badchar");	
+		message("xmlui.administrative.registries.EditRole.error_element_badchar");	
 	private static final Message T_error_element_tolong =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error_element_tolong");	
+		message("xmlui.administrative.registries.EditRole.error_element_tolong");	
 	private static final Message T_error_qualifier_tolong =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error_qualifier_tolong");	
+		message("xmlui.administrative.registries.EditRole.error_qualifier_tolong");	
 	private static final Message T_error_qualifier_badchar =
-		message("xmlui.administrative.submissionprocess.EditSubmissionProcess.error_qualifier_badchar");	
+		message("xmlui.administrative.registries.EditRole.error_qualifier_badchar");	
 	
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/admin/submissionprocess",T_metadata_registry_trail);
+        pageMeta.addTrailLink(contextPath + "/admin/metadata-registry",T_metadata_registry_trail);
         pageMeta.addTrail().addContent(T_trail);
     }
 	
@@ -106,12 +105,13 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException 
 	{
 		// Get our parameters & state
-		int processID = parameters.getParameterAsInteger("processID",-1);
+		int roleID = parameters.getParameterAsInteger("roleID",-1);
 		int updateID = parameters.getParameterAsInteger("updateID",-1);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
-		SubmissionProcess process = SubmissionProcess.find(context,processID);
-		SubmissionStep[] steps = SubmissionProcess.getSteps(context, processID);
-		String processName = process.getName();
+		MetadataSchema schema = MetadataSchema.find(context,roleID);
+		MetadataField[] fields = MetadataField.findAllInSchema(context, roleID);
+		String schemaName = schema.getName();
+		String schemaNamespace = schema.getNamespace();
 		
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
@@ -124,49 +124,57 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
 		}
 		
 	
-        // DIVISION: edit-process
-		Division main = body.addInteractiveDivision("process-edit",contextPath+"/admin/submissionprocess",Division.METHOD_POST,"primary administrative submissionprocess");
-		main.setHead(T_head1.parameterize(processName));
-	
+        // DIVISION: edit-schema
+		Division main = body.addInteractiveDivision("metadata-schema-edit",contextPath+"/admin/metadata-registry",Division.METHOD_POST,"primary administrative metadata-registry");
+		main.setHead(T_head1.parameterize(schemaName));
+		main.addPara(T_para1.parameterize(schemaNamespace));
+		
 		
 		// DIVISION: add or updating a metadata field
 		if (updateID >= 0)
         {
             // Updating an existing field
-            addUpdateFieldForm(main, processName, updateID, errors);
+            addUpdateFieldForm(main, schemaName, updateID, errors);
         }
 		else
         {
             // Add a new field
-            addNewStepForm(main, processName, errors);
+            addNewFieldForm(main, schemaName, errors);
         }
 		
-		
-		
 		// DIVISION: existing fields
-		Division existingFields = main.addDivision("process-edit-existing-fields");
+		Division existingFields = main.addDivision("metadata-schema-edit-existing-fields");
 		existingFields.setHead(T_head2);
 		
-		Table table = existingFields.addTable("process-edit-existing-fields", steps.length+1, 5);
+		Table table = existingFields.addTable("metadata-schema-edit-existing-fields", fields.length+1, 5);
 		
 		Row header = table.addRow(Row.ROLE_HEADER);
 		header.addCellContent(T_column1);
 		header.addCellContent(T_column2);
 		header.addCellContent(T_column3);
+		header.addCellContent(T_column4);
 		
-		for (SubmissionStep step:steps)
+		for (MetadataField field : fields)
 		{
-			String id = String.valueOf(step.getId());
-			String stepName = step.getName();
-
+			String id = String.valueOf(field.getFieldID());
+			String fieldElement = field.getElement();
+			String fieldQualifier = field.getQualifier();
+			
+			String fieldName = schemaName +"."+ fieldElement;
+			if (fieldQualifier != null && fieldQualifier.length() > 0)
+            {
+                fieldName += "." + fieldQualifier;
+            }
 				
 			boolean highlight = false;
-			if (step.getId() == highlightID)
+			if (field.getFieldID() == highlightID)
             {
                 highlight = true;
             }
-
-			String url = contextPath + "/admin/submissionprocess?administrative-continue="+knot.getId()+"&submit_edit&stepID="+id;
+			
+			String fieldScopeNote = field.getScopeNote();
+			
+			String url = contextPath + "/admin/metadata-registry?administrative-continue="+knot.getId()+"&submit_edit&fieldID="+id;
 			
 			Row row;
 			if (highlight)
@@ -178,15 +186,16 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
                 row = table.addRow();
             }
 			
-			CheckBox select = row.addCell().addCheckBox("select_step");
+			CheckBox select = row.addCell().addCheckBox("select_field");
 			select.setLabel(id);
 			select.addOption(id);
 			
 			row.addCell().addContent(id);
-			row.addCell().addXref(url,stepName);
+			row.addCell().addXref(url,fieldName);
+			row.addCell().addContent(fieldScopeNote);
 		}
 		
-		if (steps.length == 0)
+		if (fields.length == 0)
 		{
 			// No fields, let the user know.
 			table.addRow().addCell(1,4).addHighlight("italic").addContent(T_empty);
@@ -197,42 +206,58 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
 			// Only show the actions if there are fields available to preform them on.
 			Para actions = main.addPara();
 			actions.addButton("submit_delete").setValue(T_submit_delete);
-//			if (SubmissionProcess.findAll(context).length > 1)
-//            {
-//                actions.addButton("submit_move").setValue(T_submit_move);
-//            }
+			if (MetadataSchema.findAll(context).length > 1)
+            {
+                actions.addButton("submit_move").setValue(T_submit_move);
+            }
 			actions.addButton("submit_return").setValue(T_submit_return);
 		}
 		
 		main.addHidden("administrative-continue").setValue(knot.getId());
-
         
    }
 	
 	
 	/**
-	 * Add a form prompting the user to add a new field to the this process.
+	 * Add a form prompting the user to add a new field to the this schema.
 	 *  
 	 * @param div The division to add the form too.
-	 * @param processName The processName currently being operated on.
+	 * @param schemaName The schemaName currently being operated on.
 	 * @param errors A list of errors from previous attempts at adding new fields.
 	 */
-	public void addNewStepForm(Division div, String processName, java.util.List<String> errors) throws WingException
+	public void addNewFieldForm(Division div, String schemaName, java.util.List<String> errors) throws WingException
 	{
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		String nameValue = request.getParameter("name");
+		String elementValue = request.getParameter("newElement");
+		String qualifierValue = request.getParameter("newQualifier");
+		String noteValue = request.getParameter("newNote");
 		
-        Division newStep = div.addDivision("edit-process-new-step");
-		newStep.setHead(T_head3);
+		Division newField = div.addDivision("edit-schema-new-field");
+		newField.setHead(T_head3);
 		
-		List form = newStep.addList("edit-process-new-step-form",List.TYPE_FORM);
+		List form = newField.addList("edit-schema-new-field-form",List.TYPE_FORM);
 		addFieldErrors(form, errors);
 		
 		form.addLabel(T_name);
-		Text name = form.addItem().addText("name");
-				
-		name.setSize(15);
-		name.setValue(nameValue);
+		Highlight item =form.addItem().addHighlight("big");
+		
+		item.addContent(schemaName+" . ");
+		Text element = item.addText("newElement");
+		item.addContent(" . ");
+		Text qualifier = item.addText("newQualifier");
+		
+		
+		element.setSize(15);
+		element.setValue(elementValue);
+		
+		qualifier.setSize(15);
+		qualifier.setValue(qualifierValue);
+		
+		TextArea scopeNote =form.addItem().addTextArea("newNote");
+		scopeNote.setLabel(T_note);
+		scopeNote.setHelp(T_note_help);
+		scopeNote.setSize(2, 35);
+		scopeNote.setValue(noteValue);
 		
 		form.addItem().addButton("submit_add").setValue(T_submit_add);
 	}
@@ -242,11 +267,11 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
 	 * Update an existing field by promting the user for it's values.
 	 *  
 	 * @param div The division to add the form too.
-	 * @param processName The processName currently being operated on.
+	 * @param schemaName The schemaName currently being operated on.
 	 * @param fieldID The id of the field being updated.
 	 * @param errors A list of errors from previous attempts at updaating the field.
 	 */
-	public void addUpdateFieldForm(Division div, String processName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
+	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
 	{
 		
 		MetadataField field = MetadataField.find(context, fieldID);
@@ -270,10 +295,10 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
         }
 		
 		
-		Division newStep = div.addDivision("edit-process-update-field");
-		newStep.setHead(T_head4.parameterize(field.getFieldID()));
+		Division newField = div.addDivision("edit-schema-update-field");
+		newField.setHead(T_head4.parameterize(field.getFieldID()));
 		
-		List form = newStep.addList("edit-process-update-field-form",List.TYPE_FORM);
+		List form = newField.addList("edit-schema-update-field-form",List.TYPE_FORM);
 		
 
 		addFieldErrors(form, errors);
@@ -281,7 +306,7 @@ public class EditSubmissionProcess extends AbstractDSpaceTransformer
 		form.addLabel(T_name);
 		Highlight item =form.addItem().addHighlight("big");
 		
-		item.addContent(processName+" . ");
+		item.addContent(schemaName+" . ");
 		Text element = item.addText("updateElement");
 		item.addContent(" . ");
 		Text qualifier = item.addText("updateQualifier");

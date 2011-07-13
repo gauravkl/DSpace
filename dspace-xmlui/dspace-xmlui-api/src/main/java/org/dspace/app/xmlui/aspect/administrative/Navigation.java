@@ -67,6 +67,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_administrative_access_control 	= message("xmlui.administrative.Navigation.administrative_access_control");
     private static final Message T_administrative_people 			= message("xmlui.administrative.Navigation.administrative_people");
     private static final Message T_administrative_groups 			= message("xmlui.administrative.Navigation.administrative_groups");
+    private static final Message T_administrative_roles 			= message("xmlui.administrative.Navigation.administrative_roles");
     private static final Message T_administrative_authorizations 	= message("xmlui.administrative.Navigation.administrative_authorizations");
     private static final Message T_administrative_registries 		= message("xmlui.administrative.Navigation.administrative_registries");
     private static final Message T_administrative_metadata 			= message("xmlui.administrative.Navigation.administrative_metadata");
@@ -289,6 +290,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 	        epeople.addItemXref(contextPath+"/admin/epeople", T_administrative_people);
 	        epeople.addItemXref(contextPath+"/admin/groups", T_administrative_groups);
 	        epeople.addItemXref(contextPath+"/admin/authorize", T_administrative_authorizations);
+            epeople.addItemXref(contextPath+"/admin/roles", T_administrative_roles);
 	        
 	        registries.setHead(T_administrative_registries);	        
 	        registries.addItemXref(contextPath+"/admin/metadata-registry",T_administrative_metadata);	        
