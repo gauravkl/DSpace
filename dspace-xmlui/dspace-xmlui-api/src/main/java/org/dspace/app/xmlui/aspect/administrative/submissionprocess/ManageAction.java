@@ -101,7 +101,7 @@ public class ManageAction extends AbstractDSpaceTransformer {
 			if (actionID > 1)
 			{
 				// If the schema is not in the required DC schema allow the user to delete it.
-				CheckBox select = row.addCell().addCheckBox("select_process");
+				CheckBox select = row.addCell().addCheckBox("select_action");
 				select.setLabel(String.valueOf(actionID));
 				select.addOption(String.valueOf(actionID));
 			}

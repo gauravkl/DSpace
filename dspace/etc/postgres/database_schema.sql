@@ -112,6 +112,7 @@ CREATE SEQUENCE step2submissionprocess_seq;
 CREATE SEQUENCE submissionstep_seq;
 CREATE SEQUENCE submissionaction_seq;
 CREATE SEQUENCE role_seq;
+CREATE SEQUENCE action2submissionstep_seq;
 
 
 -------------------------------------------------------
@@ -817,16 +818,17 @@ CREATE TABLE step2submissionprocess
   place INTEGER
 );
 
+
+CREATE TABLE submissionaction
+(
+  action_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionaction_seq'),
+  bean_id VARCHAR(64)
+);
+
 CREATE TABLE action2submissionstep
 (
   id        INTEGER PRIMARY KEY,
   step_id   INTEGER REFERENCES submissionstep(step_id),
   action_id INTEGER REFERENCES submissionaction(action_id),
   place INTEGER
-);
-
-CREATE TABLE submissionaction
-(
-  action_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionaction_seq'),
-  bean_id VARCHAR(64)
 );

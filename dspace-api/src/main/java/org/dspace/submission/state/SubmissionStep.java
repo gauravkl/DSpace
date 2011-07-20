@@ -537,7 +537,7 @@ public class SubmissionStep {
 	        return  process;
 	    }
 
-	public static void removeAction(Context context,int actionID,int step_id) throws SQLException,
+	public static void removeAction(Context context,int step_id,int actionID) throws SQLException,
 	    AuthorizeException
 	    {
 	        TableRowIterator tri = DatabaseManager.queryTable(context,"action2submissionstep",
@@ -557,5 +557,11 @@ public class SubmissionStep {
 	                tri.close();
 	        }
 	    }
+    public static void addAction(Context context,int stepID,int actionID) throws SQLException,
+           AuthorizeException
+           {
+           SubmissionAction.action2submissionstep(context,stepID,actionID);
+
+           }
 
 }

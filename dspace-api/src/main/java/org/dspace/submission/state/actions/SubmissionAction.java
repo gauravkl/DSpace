@@ -373,4 +373,13 @@ public class SubmissionAction {
 	            }
 	        }
 	    }
+     public static void action2submissionstep(Context context,int step_id,int action_id) throws SQLException,
+	    AuthorizeException
+	    {
+	        TableRow mappingRow = DatabaseManager.create(context,
+	        "action2submissionstep");
+	       mappingRow.setColumn("step_id", step_id);
+            mappingRow.setColumn("action_id", action_id);
+	        DatabaseManager.update(context, mappingRow);
+	    }
 }

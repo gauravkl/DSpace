@@ -442,8 +442,8 @@ function startManageMetadataRegistry()
 function startManageSubmissionProcess()
 {
 	assertAdministrator();
-
-	doManageSubmissionProcess();
+    
+	 doManageSubmissionProcess();
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
@@ -1079,7 +1079,6 @@ function doManageSubmissionProcess()
 
     var result = null;
     do {
-        sendPageAndWait("admin/roles/main",{},result);
         sendPageAndWait("admin/submissionprocess/main",{},result);
 		assertAdministrator();
         result = null;
@@ -1265,14 +1264,14 @@ function doManageSubmissionAction(stepID)
         else if (cocoon.request.get("submit_add"))
         {
             // Add a new action
-            var action = cocoon.request.get("action_list");
-            result = FlowRegistryUtils.processAddSubmissionAction(getDSContext(), action);
+            var actionID = cocoon.request.get("action_list");
+            result = FlowRegistryUtils.processAddSubmissionAction(getDSContext(),stepID, actionID);
         }
-        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_process"))
+        else if (cocoon.request.get("submit_delete") && cocoon.request.get("select_action"))
         {
             // Remove the selected schemas
-            var processIDs = cocoon.request.getParameterValues("select_process");
-            result = doDeleteSubmissionProcesses(processIDs)
+            var actionIDs = cocoon.request.getParameterValues("select_action");
+            result = doDeleteSubmissionActions(stepID,actionIDs)
         }
     } while(true)
 }
@@ -1310,7 +1309,7 @@ function doEditOutcome(stepID)
 }
 
 /**
- * Confirm the deletition of the listed schema
+ * Confirm the deletition of the listed step
  */
 function doDeleteSubmissionSteps(stepIDs)
 {
@@ -1323,6 +1322,22 @@ function doDeleteSubmissionSteps(stepIDs)
     {
         // Actualy delete the schemas
         var result = FlowRegistryUtils.processDeleteSubmissionSteps(getDSContext(),stepIDs)
+        return result;
+    }
+    return null;
+}
+
+function doDeleteSubmissionActions(stepID,actionIDs)
+{
+	assertAdministrator();
+
+    sendPageAndWait("admin/submissionprocess/remove-actions",{"actionIDs":actionIDs.join(',')});
+    assertAdministrator();
+
+    if (cocoon.request.get("submit_confirm"))
+    {
+        // Actualy delete the schemas
+        var result = FlowRegistryUtils.processDeleteSubmissionActions(getDSContext(),stepID,actionIDs)
         return result;
     }
     return null;
