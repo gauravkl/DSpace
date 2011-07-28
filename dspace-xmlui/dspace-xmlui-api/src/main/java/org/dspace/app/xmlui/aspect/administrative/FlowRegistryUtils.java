@@ -279,6 +279,48 @@ public class FlowRegistryUtils
 
 		return result;
 	}
+
+         public static FlowResult processAddOutcome(Context context,int stepID,int outcome) throws SQLException, AuthorizeException, NonUniqueMetadataException, UIException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+        //SubmissionProcess process = SubmissionProcess.find(context, Integer.valueOf(processID));
+		// Decode the action
+//		try
+//        {
+//           action = URLDecoder.decode(action,Constants.DEFAULT_ENCODING);
+//        }
+//        catch (UnsupportedEncodingException uee)
+//        {
+//            throw new UIException(uee);
+//        }
+
+
+//		if (action == null ||
+//			action.length() <= 0 ||
+//			action.indexOf('.') != -1 ||
+//			action.indexOf('_') != -1 ||
+//			action.indexOf(' ') != -1)
+//        {
+//            // The name must not be empty nor contain dot, underscore or spaces.
+//            result.addError("action");
+//        }
+
+
+		if (result.getErrors() == null)
+		{
+			SubmissionStep step = SubmissionStep.find(context,stepID);
+		    SubmissionStep.addOutcome(context,  step.getId(),outcome);
+		    context.commit();
+
+		    result.setContinue(true);
+		    result.setOutcome(true);
+		    result.setMessage(T_add_submissionstep_success_notice);
+		    result.setParameter("stepID", step.getId());
+		}
+
+		return result;
+	}
         /**
 	 * Delete the given schemas.
 	 *

@@ -3,13 +3,14 @@ package org.dspace.submission.state.actions;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.WorkspaceService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.submission.RoleMembers;
+import org.dspace.submission.state.SubmissionStep;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class SubmissionAction {
     
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionAction.class);
-    private WorkflowActionConfig parent;
+    private SubmissionActionConfig parent;
     private TableRow row;
     
     private String bean_id ;
@@ -53,11 +54,14 @@ public class SubmissionAction {
 
     }
 
-//    public void activate(Context c, WorkspaceItem wf) throws SQLException, IOException, AuthorizeException;//, WorkflowException;
-//     {
-//     }
+    public void activate(Context c, WorkspaceService wf) throws SQLException, IOException, AuthorizeException//, WorkflowException;
+     {
+     }
 
-   // public ActionResult execute(Context c, WorkspaceItem wfi, SubmissionStep step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException;// WorkflowException;
+      public ActionResult execute(Context c, WorkspaceService wfi, SubmissionStep step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException// WorkflowException;
+      {
+        return null;
+      }
 
     public String getBean_id() {
            return bean_id;
@@ -85,11 +89,11 @@ public class SubmissionAction {
                this.bean_id = bean_id;
            }
 
-    public WorkflowActionConfig getParent() {
+    public SubmissionActionConfig getParent() {
         return parent;
     }
 
-    public void setParent(WorkflowActionConfig parent) {
+    public void setParent(SubmissionActionConfig parent) {
         this.parent = parent;
     }
 
@@ -97,11 +101,14 @@ public class SubmissionAction {
         return "Step: " + getParent().getStep().getId() + " - action:" + getParent().getId();
     }
 
-    public void alertUsersOnActivation(Context c, WorkspaceItem wfi, RoleMembers members) throws SQLException, IOException {
+    public void alertUsersOnActivation(Context c, WorkspaceService wfi, RoleMembers members) throws SQLException, IOException {
 
     }
 
-    //public boolean isAuthorized(Context context, HttpServletRequest request, WorkspaceItem wfi) throws SQLException, AuthorizeException, IOException;//, WorkflowConfigurationException;
+    public boolean isAuthorized(Context context, HttpServletRequest request, WorkspaceService wfi) throws SQLException, AuthorizeException, IOException//, WorkflowConfigurationException;
+    {
+        return true;
+    }
 
 
     /**

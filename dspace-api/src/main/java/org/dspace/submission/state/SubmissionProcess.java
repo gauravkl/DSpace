@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.WorkspaceService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -98,7 +98,7 @@ public class SubmissionProcess {
         return SubmissionStep.find(context,stepID);
 	}
 
-	public SubmissionStep getNextStep(Context context, WorkspaceItem wfi, SubmissionStep currentStep, int outcome) throws IOException,// WorkflowConfigurationException, WorkflowException,
+	public SubmissionStep getNextStep(Context context, WorkspaceService wfi, SubmissionStep currentStep, int outcome) throws IOException,// WorkflowConfigurationException, WorkflowException,
             SQLException {
 		Integer nextStepID = currentStep.getNextStepID(outcome);
 		if(nextStepID != null){

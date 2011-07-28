@@ -306,5 +306,4 @@ public class EditSubmissionStep extends AbstractDSpaceTransformer
 			form.addItem(T_error_qualifier_badchar);
 		}
 	}
-	
 }

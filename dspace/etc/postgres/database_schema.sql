@@ -495,8 +495,9 @@ CREATE TABLE WorkspaceItem
   published_before  BOOL,
   multiple_files    BOOL,
   -- How for the user has got in the submit process
-  stage_reached     INTEGER,
-  page_reached      INTEGER
+  action_id INTEGER REFERENCES submissionaction(action_id),
+  step_id INTEGER REFERENCES submissionstep(step_id),
+  process_id INTEGER REFERENCES submissionprocess(process_id)
 );
 
 CREATE INDEX workspace_item_fk_idx ON WorkspaceItem(item_id);
@@ -831,4 +832,17 @@ CREATE TABLE action2submissionstep
   step_id   INTEGER REFERENCES submissionstep(step_id),
   action_id INTEGER REFERENCES submissionaction(action_id),
   place INTEGER
+);
+
+CREATE TABLE outcome
+(
+  outcome_id	    INTEGER PRIMARY KEY,
+  status    INTEGER 
+); 	 
+
+CREATE TABLE step2outcome
+(
+	id        INTEGER PRIMARY KEY,
+  	outcome_id INTEGER REFERENCES outcome(outcome_id),
+  	step_id   INTEGER REFERENCES submissionstep(step_id)
 );

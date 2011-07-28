@@ -7,6 +7,26 @@
  */
 package org.dspace.content;
 
+import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
+import org.dspace.core.*;
+import org.dspace.eperson.Group;
+import org.dspace.event.Event;
+import org.dspace.handle.HandleManager;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.submission.state.SubmissionProcess;
+import org.dspace.workflow.WorkflowItem;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
@@ -16,29 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
-
-import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authorize.AuthorizeConfiguration;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.IndexBrowse;
-import org.dspace.browse.ItemCounter;
-import org.dspace.browse.ItemCountException;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
-import org.dspace.event.Event;
-import org.dspace.handle.HandleManager;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.workflow.WorkflowItem;
 
 /**
  * Class representing a collection.
@@ -1465,4 +1462,32 @@ public class Collection extends DSpaceObject
             return null;
         }
     }
+
+    public SubmissionProcess getSubmissionProcess(Context context)
+                   throws SQLException
+            {
+               SubmissionProcess process=null ;
+
+               // Get all the collection2submissionprocess rows
+               TableRowIterator tri = DatabaseManager.queryTable(context,"collection2submissionprocess",
+                       "SELECT * FROM collection2submissionprocess WHERE collection_id= ? ",getID());
+
+               try
+               {
+                   // get Collection objects
+                   while (tri.hasNext())
+                   {   int id=tri.next().getIntColumn("process_id");
+                       process=SubmissionProcess.find(context,id);
+                   }
+               }
+               finally
+               {
+                   // close the TableRowIterator to free up resources
+                   if (tri != null)
+                       tri.close();
+               }
+
+               // Convert list into an array
+               return  process;
+           }
 }

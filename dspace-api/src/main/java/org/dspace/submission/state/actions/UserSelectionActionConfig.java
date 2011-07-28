@@ -9,7 +9,7 @@ import org.dspace.submission.state.actions.userassignment.UserSelectionAction;
  * Time: 14:57:17
  * To change this template use File | Settings | File Templates.
  */
-public class UserSelectionActionConfig extends WorkflowActionConfig{
+public class UserSelectionActionConfig extends SubmissionActionConfig{
 
     public UserSelectionActionConfig(String id) {
         super(id);

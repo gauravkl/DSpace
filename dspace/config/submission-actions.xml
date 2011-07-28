@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <!-- At the top are our bean class identifiers --->
+    <bean id="describe" class="DescribeAction" scope="prototype"/>
+  
+ <!-- Below the class identifiers come the declarations for out actions/userSelectionMethods -->
+
+ <!-- Use class workflowActionConfig for an action -->
+ <bean id="describe" class="org.dspace.workflow.actions.WorkflowActionConfig">
+     <constructor-arg type="java.lang.String" value="describe"/>
+
+     <property name="processingAction" ref="{action.api.id}"/>
+     <property name="requiresUI" value="{true}"/>
+ </bean>
+</beans>

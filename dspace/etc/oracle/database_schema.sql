@@ -1,5 +1,5 @@
 --
--- database_schema.sql
+-- database_schema.sql (ORACLE version!)
 --
 -- Version: $Revision$
 --
@@ -34,52 +34,14 @@
 -- TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 -- USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 -- DAMAGE.
---
---
---
---
---   DSpace SQL schema
---
---   Authors:   Peter Breton, Robert Tansley, David Stuve, Daniel Chudnov,
---              Richard Jones
---
---   This file is used as-is to initialize a database. Therefore,
---   table and view definitions must be ordered correctly.
---
---   Caution: THIS IS POSTGRESQL-SPECIFIC:
---
---   * SEQUENCES are used for automatic ID generation
---   * FUNCTION getnextid used for automatic ID generation
---
---
---   To convert to work with another database, you need to ensure
---   an SQL function 'getnextid', which takes a table name as an
---   argument, will return a safe new ID to use to create a new
---   row in that table.
-
--------------------------------------------------------
--- Function for obtaining new IDs.
---
---   * The argument is a table name
---   * It returns a new ID safe to use for that table
---
---   The function reads the next value from the sequence
---   'tablename_seq'
--------------------------------------------------------
-CREATE FUNCTION getnextid(VARCHAR(40)) RETURNS INTEGER AS
-    'SELECT CAST (nextval($1 || ''_seq'') AS INTEGER) AS RESULT;' LANGUAGE SQL;
 
 
--------------------------------------------------------
--- Sequences for creating new IDs (primary keys) for
--- tables.  Each table must have a corresponding
--- sequence called 'tablename_seq'.
--------------------------------------------------------
 CREATE SEQUENCE bitstreamformatregistry_seq;
 CREATE SEQUENCE fileextension_seq;
 CREATE SEQUENCE bitstream_seq;
 CREATE SEQUENCE eperson_seq;
-CREATE SEQUENCE epersongroup_seq;
+CREATE SEQUENCE epersongroup_seq START WITH 2;
+-- we reserve 0 and 1
 CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
@@ -100,17 +62,14 @@ CREATE SEQUENCE registrationdata_seq;
 CREATE SEQUENCE subscription_seq;
 CREATE SEQUENCE communities2item_seq;
 CREATE SEQUENCE epersongroup2workspaceitem_seq;
-CREATE SEQUENCE metadataschemaregistry_seq;
+CREATE SEQUENCE metadataschemaregistry_seq START WITH 2;
+-- 1 is reserved for Dublin Core
 CREATE SEQUENCE metadatafieldregistry_seq;
 CREATE SEQUENCE metadatavalue_seq;
 CREATE SEQUENCE group2group_seq;
 CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
-CREATE SEQUENCE submissionprocess_seq;
-CREATE SEQUENCE submissionstep_seq;
-CREATE SEQUENCE role_seq;
-
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -118,12 +77,12 @@ CREATE SEQUENCE role_seq;
 CREATE TABLE BitstreamFormatRegistry
 (
   bitstream_format_id INTEGER PRIMARY KEY,
-  mimetype            VARCHAR(256),
-  short_description   VARCHAR(128) UNIQUE,
-  description         TEXT,
+  mimetype            VARCHAR2(256),
+  short_description   VARCHAR2(128) UNIQUE,
+  description         VARCHAR2(2000),
   support_level       INTEGER,
   -- Identifies internal types
-  internal             BOOL
+  internal             NUMBER(1)
 );
 
 -------------------------------------------------------
@@ -133,7 +92,7 @@ CREATE TABLE FileExtension
 (
   file_extension_id    INTEGER PRIMARY KEY,
   bitstream_format_id  INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
-  extension            VARCHAR(16)
+  extension            VARCHAR2(16)
 );
 
 CREATE INDEX fe_bitstream_fk_idx ON FileExtension(bitstream_format_id);
@@ -145,15 +104,15 @@ CREATE TABLE Bitstream
 (
    bitstream_id            INTEGER PRIMARY KEY,
    bitstream_format_id     INTEGER REFERENCES BitstreamFormatRegistry(bitstream_format_id),
-   name                    VARCHAR(256),
-   size_bytes              BIGINT,
-   checksum                VARCHAR(64),
-   checksum_algorithm      VARCHAR(32),
-   description             TEXT,
-   user_format_description TEXT,
-   source                  VARCHAR(256),
-   internal_id             VARCHAR(256),
-   deleted                 BOOL,
+   name                    VARCHAR2(256),
+   size_bytes              INTEGER,
+   checksum                VARCHAR2(64),
+   checksum_algorithm      VARCHAR2(32),
+   description             VARCHAR2(2000),
+   user_format_description VARCHAR2(2000),
+   source                  VARCHAR2(256),
+   internal_id             VARCHAR2(256),
+   deleted                 NUMBER(1),
    store_number            INTEGER,
    sequence_id             INTEGER
 );
@@ -166,18 +125,18 @@ CREATE INDEX bit_bitstream_fk_idx ON Bitstream(bitstream_format_id);
 CREATE TABLE EPerson
 (
   eperson_id          INTEGER PRIMARY KEY,
-  email               VARCHAR(64) UNIQUE,
-  password            VARCHAR(64),
-  firstname           VARCHAR(64),
-  lastname            VARCHAR(64),
-  can_log_in          BOOL,
-  require_certificate BOOL,
-  self_registered     BOOL,
+  email               VARCHAR2(64) UNIQUE,
+  password            VARCHAR2(64),
+  firstname           VARCHAR2(64),
+  lastname            VARCHAR2(64),
+  can_log_in          NUMBER(1),
+  require_certificate NUMBER(1),
+  self_registered     NUMBER(1),
   last_active         TIMESTAMP,
   sub_frequency       INTEGER,
-  phone               VARCHAR(32),
-  netid               VARCHAR(64),
-  language            VARCHAR(64)
+  phone               VARCHAR2(32),
+  netid               VARCHAR2(64) UNIQUE,
+  language            VARCHAR2(64)
 );
 
 -- index by email
@@ -192,7 +151,7 @@ CREATE INDEX eperson_netid_idx ON EPerson(netid);
 CREATE TABLE EPersonGroup
 (
   eperson_group_id INTEGER PRIMARY KEY,
-  name             VARCHAR(256) UNIQUE
+  name             VARCHAR2(256) UNIQUE
 );
 
 ------------------------------------------------------
@@ -224,8 +183,8 @@ CREATE TABLE Group2GroupCache
   child_id  INTEGER REFERENCES EPersonGroup(eperson_group_id)
 );
 
-CREATE INDEX g2gc_parent_fk_idx ON Group2Group(parent_id);
-CREATE INDEX g2gc_child_fk_idx ON Group2Group(child_id);
+CREATE INDEX g2gc_parent_fk_idx ON Group2GroupCache(parent_id);
+CREATE INDEX g2gc_child_fk_idx ON Group2GroupCache(child_id);
 
 -------------------------------------------------------
 -- Item table
@@ -234,9 +193,9 @@ CREATE TABLE Item
 (
   item_id         INTEGER PRIMARY KEY,
   submitter_id    INTEGER REFERENCES EPerson(eperson_id),
-  in_archive      BOOL,
-  withdrawn       BOOL,
-  last_modified   TIMESTAMP WITH TIME ZONE,
+  in_archive      NUMBER(1),
+  withdrawn       NUMBER(1),
+  last_modified   TIMESTAMP,
   owning_collection INTEGER
 );
 
@@ -248,7 +207,7 @@ CREATE INDEX item_submitter_fk_idx ON Item(submitter_id);
 CREATE TABLE Bundle
 (
   bundle_id          INTEGER PRIMARY KEY,
-  name               VARCHAR(16),  -- ORIGINAL | THUMBNAIL | TEXT
+  name               VARCHAR2(16),  -- ORIGINAL | THUMBNAIL | TEXT
   primary_bitstream_id  INTEGER REFERENCES Bitstream(bitstream_id)
 );
 
@@ -282,38 +241,41 @@ CREATE TABLE Bundle2Bitstream
 -- index by bundle_id
 CREATE INDEX bundle2bitstream_bundle_idx ON Bundle2Bitstream(bundle_id);
 
-CREATE INDEX bundle2bitstream_bitstream_fk_idx ON Bundle2Bitstream(bitstream_id);
+CREATE INDEX bundle2bits_bitstream_fk_idx ON Bundle2Bitstream(bitstream_id);
 
 -------------------------------------------------------
 -- Metadata Tables and Sequences
 -------------------------------------------------------
 CREATE TABLE MetadataSchemaRegistry
 (
-  metadata_schema_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadataschemaregistry_seq'),
+  metadata_schema_id INTEGER PRIMARY KEY,
   namespace          VARCHAR(256) UNIQUE,
   short_id           VARCHAR(32) UNIQUE
 );
 
 CREATE TABLE MetadataFieldRegistry
 (
-  metadata_field_id   INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatafieldregistry_seq'),
+  metadata_field_id   INTEGER PRIMARY KEY,
   metadata_schema_id  INTEGER NOT NULL REFERENCES MetadataSchemaRegistry(metadata_schema_id),
-  element             VARCHAR(64),
-  qualifier           VARCHAR(64),
-  scope_note          TEXT
+  element    VARCHAR(64),
+  qualifier  VARCHAR(64),
+  scope_note VARCHAR2(2000)
 );
 
 CREATE TABLE MetadataValue
 (
-  metadata_value_id  INTEGER PRIMARY KEY DEFAULT NEXTVAL('metadatavalue_seq'),
-  item_id            INTEGER REFERENCES Item(item_id),
+  metadata_value_id  INTEGER PRIMARY KEY,
+  item_id       INTEGER REFERENCES Item(item_id),
   metadata_field_id  INTEGER REFERENCES MetadataFieldRegistry(metadata_field_id),
-  text_value         TEXT,
-  text_lang          VARCHAR(24),
+  text_value CLOB,
+  text_lang  VARCHAR(24),
   place              INTEGER,
-  authority          VARCHAR(100),
-  confidence         INTEGER DEFAULT -1
+  authority VARCHAR(100),
+  confidence INTEGER DEFAULT -1
 );
+
+-- Create the DC schema
+INSERT INTO MetadataSchemaRegistry VALUES (1,'http://dublincore.org/documents/dcmi-terms/','dc');
 
 -- Create a dcvalue view for backwards compatibilty
 CREATE VIEW dcvalue AS
@@ -338,12 +300,12 @@ CREATE INDEX metadatafield_schema_idx ON MetadataFieldRegistry(metadata_schema_i
 CREATE TABLE Community
 (
   community_id      INTEGER PRIMARY KEY,
-  name              VARCHAR(128),
-  short_description VARCHAR(512),
-  introductory_text TEXT,
+  name              VARCHAR2(128),
+  short_description VARCHAR2(512),
+  introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
-  copyright_text    TEXT,
-  side_bar_text     TEXT,
+  copyright_text    CLOB,
+  side_bar_text     VARCHAR2(2000),
   admin             INTEGER REFERENCES EPersonGroup( eperson_group_id )
 );
 
@@ -356,15 +318,15 @@ CREATE INDEX community_admin_fk_idx ON Community(admin);
 CREATE TABLE Collection
 (
   collection_id     INTEGER PRIMARY KEY,
-  name              VARCHAR(128),
-  short_description VARCHAR(512),
-  introductory_text TEXT,
+  name              VARCHAR2(128),
+  short_description VARCHAR2(512),
+  introductory_text CLOB,
   logo_bitstream_id INTEGER REFERENCES Bitstream(bitstream_id),
   template_item_id  INTEGER REFERENCES Item(item_id),
-  provenance_description  TEXT,
-  license           TEXT,
-  copyright_text    TEXT,
-  side_bar_text     TEXT,
+  provenance_description  VARCHAR2(2000),
+  license           CLOB,
+  copyright_text    CLOB,
+  side_bar_text     VARCHAR2(2000),
   workflow_step_1   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_2   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
   workflow_step_3   INTEGER REFERENCES EPersonGroup( eperson_group_id ),
@@ -405,10 +367,9 @@ CREATE TABLE Community2Collection
   CONSTRAINT comm2coll_collection_fk FOREIGN KEY (collection_id) REFERENCES Collection(collection_id) DEFERRABLE
 );
 
--- Index on community ID
-CREATE INDEX Community2Collection_community_id_idx ON Community2Collection(community_id);
--- Index on collection ID
-CREATE INDEX Community2Collection_collection_id_idx ON Community2Collection(collection_id);
+-- Improve mapping tables
+CREATE INDEX Comm2Coll_community_id_idx ON Community2Collection(community_id);
+CREATE INDEX Comm2Coll_collection_id_idx ON Community2Collection(collection_id);
 
 -------------------------------------------------------
 -- Collection2Item table
@@ -423,7 +384,8 @@ CREATE TABLE Collection2Item
 
 -- index by collection_id
 CREATE INDEX collection2item_collection_idx ON Collection2Item(collection_id);
--- and item_id
+
+-- Improve mapping tables
 CREATE INDEX Collection2Item_item_id_idx ON Collection2Item( item_id );
 
 -------------------------------------------------------
@@ -463,21 +425,20 @@ CREATE INDEX epersongroup2eperson_group_idx on EPersonGroup2EPerson(eperson_grou
 
 CREATE INDEX epg2ep_eperson_fk_idx ON EPersonGroup2EPerson(eperson_id);
 
+
 -------------------------------------------------------
 -- Handle table
 -------------------------------------------------------
 CREATE TABLE Handle
 (
   handle_id        INTEGER PRIMARY KEY,
-  handle           VARCHAR(256) UNIQUE,
+  handle           VARCHAR2(256) UNIQUE,
   resource_type_id INTEGER,
   resource_id      INTEGER
 );
 
--- index by handle, commonly looked up
-CREATE INDEX handle_handle_idx ON Handle(handle);
 -- index by resource id and resource type id
-CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
+CREATE INDEX handle_resource_id_type_idx ON handle(resource_id, resource_type_id);
 
 -------------------------------------------------------
 --  WorkspaceItem table
@@ -488,9 +449,9 @@ CREATE TABLE WorkspaceItem
   item_id           INTEGER REFERENCES Item(item_id),
   collection_id     INTEGER REFERENCES Collection(collection_id),
   -- Answers to questions on first page of submit UI
-  multiple_titles   BOOL,
-  published_before  BOOL,
-  multiple_files    BOOL,
+  multiple_titles   NUMBER(1),  -- boolean
+  published_before  NUMBER(1),
+  multiple_files    NUMBER(1),
   -- How for the user has got in the submit process
   stage_reached     INTEGER,
   page_reached      INTEGER
@@ -509,17 +470,14 @@ CREATE TABLE WorkflowItem
   collection_id  INTEGER REFERENCES Collection(collection_id),
   state          INTEGER,
   owner          INTEGER REFERENCES EPerson(eperson_id),
-
   -- Answers to questions on first page of submit UI
-  multiple_titles       BOOL,
-  published_before      BOOL,
-  multiple_files        BOOL
+  multiple_titles       NUMBER(1),
+  published_before      NUMBER(1),
+  multiple_files        NUMBER(1)
   -- Note: stage reached not applicable here - people involved in workflow
   -- can always jump around submission UI
-
 );
 
-CREATE INDEX workflow_item_fk_idx ON WorkflowItem(item_id);
 CREATE INDEX workflow_coll_fk_idx ON WorkflowItem(collection_id);
 CREATE INDEX workflow_owner_fk_idx ON WorkflowItem(owner);
 
@@ -536,14 +494,15 @@ CREATE TABLE TasklistItem
 CREATE INDEX tasklist_eperson_fk_idx ON TasklistItem(eperson_id);
 CREATE INDEX tasklist_workflow_fk_idx ON TasklistItem(workflow_id);
 
+
 -------------------------------------------------------
 --  RegistrationData table
 -------------------------------------------------------
 CREATE TABLE RegistrationData
 (
   registrationdata_id   INTEGER PRIMARY KEY,
-  email                 VARCHAR(64) UNIQUE,
-  token                 VARCHAR(48),
+  email                 VARCHAR2(64) UNIQUE,
+  token                 VARCHAR2(48),
   expires               TIMESTAMP
 );
 
@@ -566,16 +525,16 @@ CREATE INDEX subs_collection_fk_idx ON Subscription(collection_id);
 -- EPersonGroup2WorkspaceItem table
 -------------------------------------------------------------------------------
 
-CREATE TABLE epersongroup2workspaceitem
+CREATE TABLE EPersonGroup2WorkspaceItem
 (
-  id integer DEFAULT nextval('epersongroup2workspaceitem_seq'),
-  eperson_group_id integer REFERENCES EPersonGroup(eperson_group_id),
-  workspace_item_id integer REFERENCES WorkspaceItem(workspace_item_id),
-  CONSTRAINT epersongroup2item_pkey PRIMARY KEY (id)
+  id INTEGER PRIMARY KEY,
+  eperson_group_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
+  workspace_item_id INTEGER REFERENCES WorkspaceItem(workspace_item_id)
 );
 
 CREATE INDEX epg2wi_group_fk_idx ON epersongroup2workspaceitem(eperson_group_id);
 CREATE INDEX epg2wi_workspace_fk_idx ON epersongroup2workspaceitem(workspace_item_id);
+
 
 -------------------------------------------------------
 --  Communities2Item table
@@ -587,9 +546,8 @@ CREATE TABLE Communities2Item
    item_id                 INTEGER REFERENCES Item(item_id)
 );
 
--- Index by item_id for update/re-index
+-- Indexing browse tables update/re-index performance
 CREATE INDEX Communities2Item_item_id_idx ON Communities2Item( item_id );
-
 CREATE INDEX Comm2Item_community_fk_idx ON Communities2Item( community_id );
 
 -------------------------------------------------------
@@ -621,7 +579,7 @@ CREATE TABLE community_item_count (
 -------------------------------------------------------
 -- We don't use getnextid() for 'anonymous' since the sequences start at '1'
 INSERT INTO epersongroup VALUES(0, 'Anonymous');
-INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
+INSERT INTO epersongroup VALUES(1, 'Administrator');
 
 
 -------------------------------------------------------
@@ -632,8 +590,8 @@ INSERT INTO epersongroup VALUES(getnextid('epersongroup'), 'Administrator');
 
 CREATE TABLE checksum_results
 (
-    result_code VARCHAR PRIMARY KEY,
-    result_description VARCHAR
+    result_code VARCHAR(64) PRIMARY KEY,
+    result_description VARCHAR2(2000)
 );
 
 
@@ -646,14 +604,14 @@ CREATE TABLE checksum_results
 CREATE TABLE most_recent_checksum
 (
     bitstream_id INTEGER PRIMARY KEY REFERENCES bitstream(bitstream_id),
-    to_be_processed BOOLEAN NOT NULL,
-    expected_checksum VARCHAR NOT NULL,
-    current_checksum VARCHAR NOT NULL,
+    to_be_processed NUMBER(1) NOT NULL,
+    expected_checksum VARCHAR(64),
+    current_checksum VARCHAR(64),
     last_process_start_date TIMESTAMP NOT NULL,
     last_process_end_date TIMESTAMP NOT NULL,
-    checksum_algorithm VARCHAR NOT NULL,
-    matched_prev_checksum BOOLEAN NOT NULL,
-    result VARCHAR REFERENCES checksum_results(result_code)
+    checksum_algorithm VARCHAR(64) NOT NULL,
+    matched_prev_checksum NUMBER(1) NOT NULL,
+    result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
 
 CREATE INDEX mrc_result_fk_idx ON most_recent_checksum( result );
@@ -661,15 +619,17 @@ CREATE INDEX mrc_result_fk_idx ON most_recent_checksum( result );
 -- A row will be inserted into this table every
 -- time a checksum is re-calculated.
 
+CREATE SEQUENCE checksum_history_seq;
+
 CREATE TABLE checksum_history
 (
-    check_id BIGSERIAL PRIMARY KEY,
+    check_id INTEGER PRIMARY KEY,
     bitstream_id INTEGER,
     process_start_date TIMESTAMP,
     process_end_date TIMESTAMP,
-    checksum_expected VARCHAR,
-    checksum_calculated VARCHAR,
-    result VARCHAR REFERENCES checksum_results(result_code)
+    checksum_expected VARCHAR(64),
+    checksum_calculated VARCHAR(64),
+    result VARCHAR(64) REFERENCES checksum_results(result_code)
 );
 
 CREATE INDEX ch_result_fk_idx ON checksum_history( result );
@@ -740,8 +700,6 @@ values
     'Bitstream marked deleted in bitstream table'
 );
 
-
-
 -------------------------------------------------------
 -- Create the harvest settings table
 -------------------------------------------------------
@@ -752,13 +710,13 @@ CREATE TABLE harvested_collection
 (
     collection_id INTEGER REFERENCES collection(collection_id) ON DELETE CASCADE,
     harvest_type INTEGER,
-    oai_source VARCHAR,
-    oai_set_id VARCHAR,
-    harvest_message VARCHAR,
-    metadata_config_id VARCHAR,
+    oai_source VARCHAR(256),
+    oai_set_id VARCHAR(256),
+    harvest_message VARCHAR2(512),
+    metadata_config_id VARCHAR(256),
     harvest_status INTEGER,
-    harvest_start_time TIMESTAMP WITH TIME ZONE,
-    last_harvested TIMESTAMP WITH TIME ZONE,
+    harvest_start_time TIMESTAMP,
+    last_harvested TIMESTAMP,
     id INTEGER PRIMARY KEY
 );
 
@@ -768,43 +726,9 @@ CREATE INDEX harvested_collection_fk_idx ON harvested_collection(collection_id);
 CREATE TABLE harvested_item
 (
     item_id INTEGER REFERENCES item(item_id) ON DELETE CASCADE,
-    last_harvested TIMESTAMP WITH TIME ZONE,
-    oai_id VARCHAR,
+    last_harvested TIMESTAMP,
+    oai_id VARCHAR(64),
     id INTEGER PRIMARY KEY
 );
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
-
--------------------------------------------------------
--- Create the submission-process tables
--------------------------------------------------------
--- list of the submission-processes,steps and actions
--- list of roles
-
--- Table: submissionprocess
-
-CREATE TABLE submissionprocess
-(
-  process_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionprocess_seq'),
-  name VARCHAR(64),
-  start_step_id INTEGER
-);
-
-CREATE TABLE submissionstep
-(
-  step_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionstep_seq'),
-  next_step_id INTEGER,
-  name VARCHAR(64),
-  selection_method_id INTEGER,
-  role_id INTEGER
-);
-
-CREATE TABLE role
-{
- role_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('role_seq'),
- name VARCHAR(64),
- description VARCHAR(256),
- scope INTEGER
-};
-
-

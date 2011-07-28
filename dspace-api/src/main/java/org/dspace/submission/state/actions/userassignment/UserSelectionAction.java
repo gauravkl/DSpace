@@ -2,7 +2,7 @@ package org.dspace.submission.state.actions.userassignment;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.WorkspaceService;
 import org.dspace.core.Context;
 import org.dspace.submission.RoleMembers;
 import org.dspace.submission.state.actions.SubmissionAction;
@@ -20,10 +20,10 @@ public abstract class UserSelectionAction extends SubmissionAction {
 
     protected static Logger log = Logger.getLogger(UserSelectionAction.class);
 
-    public abstract boolean isFinished(WorkspaceItem wfi);
+    public abstract boolean isFinished(WorkspaceService wfi);
 
 //    @Override
-//    public boolean isAuthorized(Context context, HttpServletRequest request, WorkspaceItem wfi) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
+//    public boolean isAuthorized(Context context, HttpServletRequest request, WorkspaceService wfi) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
 //        PoolTask task = null;
 //        if(context.getCurrentUser() != null)
 //            task = PoolTask.findByWorkflowIdAndEPerson(context, wfi.getID(), context.getCurrentUser().getID());
@@ -43,9 +43,9 @@ public abstract class UserSelectionAction extends SubmissionAction {
      * @param roleMembers the list of users for which tasks must be regenerated
      * @throws java.sql.SQLException ...
      */
-    public abstract void regenerateTasks(Context c, WorkspaceItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException;
+    public abstract void regenerateTasks(Context c, WorkspaceService wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException;
 
-    public abstract boolean isValidUserSelection(Context context, WorkspaceItem wfi, boolean hasUI) throws //WorkflowConfigurationException,
+    public abstract boolean isValidUserSelection(Context context, WorkspaceService wfi, boolean hasUI) throws //WorkflowConfigurationException,
      SQLException;
 
     /**

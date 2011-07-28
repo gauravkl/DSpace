@@ -1293,6 +1293,12 @@ function doEditOutcome(stepID)
             // Edit a specific schema
             result = doEditOutcome(stepID)
         }
+        else if (cocoon.request.get("save_outcome"))
+        {
+            // Edit a specific schema
+            var outcome = cocoon.request.get("outcome");
+            result = FlowRegistryUtils.processAddOutcome(getDSContext(), stepID,outcome);
+        }
         else if (cocoon.request.get("submit_add"))
         {
             // Add a new schema

@@ -3,16 +3,17 @@ package org.dspace.submission.state;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.WorkspaceService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.submission.Role;
+import org.dspace.submission.SubmissionProcessFactory;
 import org.dspace.submission.state.actions.SubmissionAction;
 import org.dspace.submission.state.actions.UserSelectionActionConfig;
-import org.dspace.submission.state.actions.WorkflowActionConfig;
+import org.dspace.submission.state.actions.SubmissionActionConfig;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class SubmissionStep {
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionStep.class);
     private UserSelectionActionConfig userSelectionMethod;
-    private HashMap<String, WorkflowActionConfig> actionConfigsMap;
+    private HashMap<String, SubmissionActionConfig> actionConfigsMap;
     private List<String> actionConfigsList;
     private Map<Integer, Integer> outcomes = new HashMap<Integer, Integer>();
     private int step_id;
@@ -46,7 +47,7 @@ public class SubmissionStep {
     private static HashMap id2step = null;
 
     public SubmissionStep(String name , Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, Integer> outcomes){
-        this.actionConfigsMap = new HashMap<String, WorkflowActionConfig>();
+        this.actionConfigsMap = new HashMap<String, SubmissionActionConfig>();
         this.outcomes = outcomes;
         this.userSelectionMethod = userSelectionMethod;
         this.role = role;
@@ -74,17 +75,16 @@ public class SubmissionStep {
         
     }
     
-    public WorkflowActionConfig getActionConfig(String actionID) {
+    public SubmissionActionConfig getActionConfig(String actionID) {
         if(actionConfigsMap.get(actionID)!=null){
             return actionConfigsMap.get(actionID);
         }
-//        else{
-//            WorkflowActionConfig action = WorkflowFactory.createWorkflowActionConfig(actionID);
-//            action.setStep(this);
-//            actionConfigsMap.put(actionID, action);
-//            return action;
-//        }
-        return null;
+        else{
+            SubmissionActionConfig action = SubmissionProcessFactory.createSubmissionActionConfig(actionID);
+            action.setStep(this);
+            actionConfigsMap.put(actionID, action);
+            return action;
+        }
     }
 
     /**
@@ -93,7 +93,7 @@ public class SubmissionStep {
      */
     public boolean hasUI(){
         for (String actionConfigId : actionConfigsList) {
-            WorkflowActionConfig actionConfig = getActionConfig(actionConfigId);
+            SubmissionActionConfig actionConfig = getActionConfig(actionConfigId);
             if (actionConfig.hasUserInterface()) {
                 return true;
             }
@@ -107,7 +107,7 @@ public class SubmissionStep {
     }
 
 
-    public boolean isValidStep(Context context, WorkspaceItem wfi) throws //WorkflowConfigurationException,
+    public boolean isValidStep(Context context, WorkspaceService wfi) throws //WorkflowConfigurationException,
             SQLException
     {
         //Check if our next step has a UI, if not then the step is valid, no need for a group
@@ -122,7 +122,7 @@ public class SubmissionStep {
             return userSelectionMethod;
     }
 
-    public WorkflowActionConfig getNextAction(WorkflowActionConfig currentAction) {
+    public SubmissionActionConfig getNextAction(SubmissionActionConfig currentAction) {
         int index = actionConfigsList.indexOf(currentAction.getId());
         if(index < actionConfigsList.size()-1){
             return getActionConfig(actionConfigsList.get(index+1));
@@ -145,7 +145,7 @@ public class SubmissionStep {
      * @param wfi the workspace item to check
      * @return if enough users have finished this task
      */
-//    public boolean isFinished(WorkspaceItem wfi){
+//    public boolean isFinished(WorkspaceService wfi){
 //        //return WorkflowRequirementsManager.getNumberOfFinishedUsers(wfi) == requiredUsers;
 //    }
 
@@ -484,7 +484,7 @@ public class SubmissionStep {
 	        // Get all the action2submissionstep rows
 	        TableRowIterator tri = DatabaseManager.queryTable(context,"action2submissionstep",
 	                "SELECT * FROM action2submissionstep WHERE step_id= ? " +
-	                " ORDER BY step_id",step_id);
+	                " ORDER BY place",step_id);
 
 	        try
 	        {
@@ -561,7 +561,23 @@ public class SubmissionStep {
            AuthorizeException
            {
            SubmissionAction.action2submissionstep(context,stepID,actionID);
-
            }
 
+     public static void addOutcome(Context context,int step_id,int outcome) throws SQLException,
+           AuthorizeException
+           {
+           TableRow mappingRow = DatabaseManager.create(context,
+	        "step2outcome");
+	       mappingRow.setColumn("step_id", step_id);
+            mappingRow.setColumn("outcome_id", outcome);
+	        DatabaseManager.update(context, mappingRow);
+           }
+     private void setStepActionConfigs(Context context) throws SQLException{
+        List<String> actionConfigIDs = new ArrayList<String>();
+        SubmissionAction[] actions = getActions(context,step_id);
+        for(int i = 0; i < actions.length; i++){
+            actionConfigIDs.add(actions[i].getBean_id());
+        }
+        this.actionConfigsList = actionConfigIDs;
+    }
 }

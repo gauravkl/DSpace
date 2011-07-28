@@ -121,7 +121,7 @@ public class EditOutcome extends AbstractDSpaceTransformer {
 //		}
         List form = main.addList("new-outcome-form",List.TYPE_FORM);
 		form.addLabel(T_status);
-		Text name = form.addItem().addText("name");
+		Text name = form.addItem().addText("outcome");
 		name.setSize(15);
 		name.setValue(nameValue);
 		Item stepName = form.addItem();
