@@ -16,6 +16,7 @@ importClass(Packages.org.dspace.handle.HandleManager);
 importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
 importClass(Packages.org.dspace.workflow.WorkflowManager);
+importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.content.WorkspaceItem);
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
@@ -30,6 +31,8 @@ importClass(Packages.org.dspace.app.util.SubmissionConfigReader);
 importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
+
+importClass(Packages.org.dspace.submission.SubmissionProcessFactory);
 
 /* Global variable which stores a comma-separated list of all fields 
  * which errored out during processing of the last step.
@@ -442,7 +445,7 @@ function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, resp
     return response_flag;
 }
 
-function submissionControl(collectionHandle, workspaceID, initStepAndPage)
+function submissionControls(collectionHandle, workspaceID, initStepAndPage)
 {
 	//load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
@@ -604,14 +607,14 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 	        }//end while more elements
         }//end if no errors
     } while ( 1 == 1)
-
 }
 
 function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 {
     // Get the collection handle for this item.
-    var submissionprocess = SubmissionProcessFactory.getSubmissionProcess(coll);
-    var step = submissionprocess.getStep(cocoon.request.get("stepID"));
+    var coll = Collection(HandleManager.resolveToObject(getDSContext(), collectionHandle));
+    var submissionprocess = SubmissionProcessFactory.getSubmissionProcess(getDSContext(),coll);
+    var step = submissionprocess.getStep(getDSContext(),cocoon.request.get("stepID"));
     var action = step.getActionConfig(cocoon.request.get("actionID"));
 
     if (workspaceID == null)
@@ -623,7 +626,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
     var action = step.getActionConfig(cocoon.request.get("actionID"));
 
     do{
-        sendPageAndWait("handle/"+handle+"/submit_new/getTask",{"id":workspaceID,"step_id":step.getId(),"action_id":action.getId()});
+        sendPageAndWait("handle/"+collectionHandle+"/submit_new/getTask",{"id":workspaceID,"process_id":submissionprocess.getID(),"step_id":step.getId(),"action_id":action.getId()});
 
 
             try{
@@ -778,8 +781,7 @@ function loadFileUploadInfo()
 			
 			//save inputstream of file contents to request attribute
 			getHttpRequest().setAttribute(fileParam + "-inputstream", fileObject.getInputStream());
-		}	
-		
+		}
     }
 }
 

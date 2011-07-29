@@ -5,18 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.submission.submit;
+package org.dspace.app.xmlui.aspect.submission.actions.processingaction;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.submission.AbstractXMLUIAction;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -26,9 +19,12 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.LicenseUtils;
-import org.dspace.license.CreativeCommons;
 import org.dspace.core.LogManager;
+import org.dspace.submission.state.actions.processingaction.LicenseAction;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * This is the last step of the item submission processes. During this
@@ -43,39 +39,39 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
  */
-public class LicenseStep extends AbstractSubmissionStep
+public class LicenseActionXMLUI extends AbstractXMLUIAction
 {
-    private static final Logger log = Logger.getLogger(LicenseStep.class);
+    private static final Logger log = Logger.getLogger(LicenseActionXMLUI.class);
     
     /** Language Strings **/
     protected static final Message T_head = 
-        message("xmlui.Submission.submit.LicenseStep.head");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.head");
     protected static final Message T_info1 = 
-        message("xmlui.Submission.submit.LicenseStep.info1");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.info1");
     protected static final Message T_info2 = 
-        message("xmlui.Submission.submit.LicenseStep.info2");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.info2");
     protected static final Message T_info3 = 
-        message("xmlui.Submission.submit.LicenseStep.info3");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.info3");
     protected static final Message T_decision_label = 
-        message("xmlui.Submission.submit.LicenseStep.decision_label");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.decision_label");
     protected static final Message T_decision_checkbox = 
-        message("xmlui.Submission.submit.LicenseStep.decision_checkbox");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.decision_checkbox");
     protected static final Message T_decision_error = 
-        message("xmlui.Submission.submit.LicenseStep.decision_error");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.decision_error");
     protected static final Message T_submit_remove = 
-        message("xmlui.Submission.submit.LicenseStep.submit_remove");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.submit_remove");
     protected static final Message T_submit_complete = 
-        message("xmlui.Submission.submit.LicenseStep.submit_complete");
+        message("xmlui.Submission.submit.LicenseActionXMLUI.submit_complete");
 	
 
     
     /**
 	 * Establish our required parameters, abstractStep will enforce these.
 	 */
-	public LicenseStep()
+	public LicenseActionXMLUI()
 	{
-		this.requireSubmission = true;
-		this.requireStep = true;
+//		this.requireSubmission = true;
+//		this.requireStep = true;
 	}
 
     
@@ -113,7 +109,7 @@ public class LicenseStep extends AbstractSubmissionStep
 		decision.addOption("accept",T_decision_checkbox);
 
 		// If user did not check "I accept" checkbox 
-		if(this.errorFlag==org.dspace.submit.step.LicenseStep.STATUS_LICENSE_REJECTED)
+		if(this.errorFlag== LicenseAction.STATUS_LICENSE_REJECTED)
 		{
             log.info(LogManager.getHeader(context, "reject_license", submissionInfo.getSubmissionLogInfo()));
 
@@ -121,7 +117,7 @@ public class LicenseStep extends AbstractSubmissionStep
 		}
 		
 		//add standard control/paging buttons
-        addControlButtons(controls);
+        //addControlButtons(controls);
 	}
     
     /** 

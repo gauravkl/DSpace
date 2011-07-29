@@ -55,6 +55,7 @@
       <map:transformer name="Submissions" src="org.dspace.app.xmlui.aspect.submission.Submissions"/>
       
       <map:transformer name="StepTransformer" src="org.dspace.app.xmlui.aspect.submission.StepTransformer"/>
+      <map:transformer name="SubmissionTransformer" src="org.dspace.app.xmlui.aspect.submission.SubmissionTransformer"/>
       
       <map:transformer name="SelectCollectionStep" src="org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep"/>
       <map:transformer name="ResumeStep" src="org.dspace.app.xmlui.aspect.submission.submit.ResumeStep"/>
@@ -308,6 +309,16 @@
               <map:parameter name="javascript.static#5" value="static/js/choice-support.js"/>
             </map:transform>
           </map:match>
+
+          <map:match pattern="handle/*/*/submit_new/getTask">
+              <map:transform type="SubmissionTransformer">
+                <map:parameter name="workspace_item_id" value="{flow-attribute:workspace_item_id}"/>
+                <map:parameter name="process_id" value="{flow-attribute:process_id}"/>
+                <map:parameter name="step_id" value="{flow-attribute:step_id}"/>
+                <map:parameter name="action_id" value="{flow-attribute:action_id}"/>
+                <!--<map:parameter name="showfull" value="{flow-attribute:showfull}"/>-->
+              </map:transform>
+            </map:match>
 
           <map:serialize type="xml"/>
           

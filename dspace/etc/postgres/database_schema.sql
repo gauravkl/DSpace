@@ -108,6 +108,7 @@ CREATE SEQUENCE group2groupcache_seq;
 CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
 CREATE SEQUENCE submissionprocess_seq;
+CREATE SEQUENCE collection2submissionprocess_seq;
 CREATE SEQUENCE step2submissionprocess_seq;
 CREATE SEQUENCE submissionstep_seq;
 CREATE SEQUENCE submissionaction_seq;
@@ -467,6 +468,82 @@ CREATE INDEX epersongroup2eperson_group_idx on EPersonGroup2EPerson(eperson_grou
 CREATE INDEX epg2ep_eperson_fk_idx ON EPersonGroup2EPerson(eperson_id);
 
 -------------------------------------------------------
+-- Create the submission-process tables
+-------------------------------------------------------
+-- list of the submission-processes,steps and actions
+-- list of roles
+
+-- Table: submissionprocess
+
+CREATE TABLE submissionprocess
+(
+  process_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionprocess_seq'),
+  name VARCHAR(64),
+  start_step_id INTEGER
+);
+
+CREATE TABLE collection2submissionprocess
+(
+  id        INTEGER PRIMARY KEY,
+  collection_id   INTEGER REFERENCES collection(collection_id),
+  process_id INTEGER REFERENCES submissionprocess(process_id)
+);
+
+CREATE TABLE submissionstep
+(
+  step_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionstep_seq'),
+  next_step_id INTEGER,
+  name VARCHAR(64),
+  selection_method_id INTEGER,
+  role_id INTEGER
+);
+
+CREATE TABLE role
+(
+ role_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('role_seq'),
+ name VARCHAR(64),
+ description VARCHAR(256),
+ scope INTEGER
+);
+
+CREATE TABLE step2submissionprocess
+(
+  id        INTEGER PRIMARY KEY,
+  step_id   INTEGER REFERENCES submissionstep(step_id),
+  process_id INTEGER REFERENCES submissionprocess(process_id),
+  place INTEGER
+);
+
+
+CREATE TABLE submissionaction
+(
+  action_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionaction_seq'),
+  bean_id VARCHAR(64)
+);
+
+CREATE TABLE action2submissionstep
+(
+  id        INTEGER PRIMARY KEY,
+  step_id   INTEGER REFERENCES submissionstep(step_id),
+  action_id INTEGER REFERENCES submissionaction(action_id),
+  place INTEGER
+);
+
+CREATE TABLE outcome
+(
+  outcome_id	    INTEGER PRIMARY KEY,
+  status    INTEGER 
+); 	 
+
+CREATE TABLE step2outcome
+(
+	id        INTEGER PRIMARY KEY,
+  	outcome_id INTEGER REFERENCES outcome(outcome_id),
+  	step_id   INTEGER REFERENCES submissionstep(step_id)
+);
+
+
+-------------------------------------------------------
 -- Handle table
 -------------------------------------------------------
 CREATE TABLE Handle
@@ -779,70 +856,3 @@ CREATE TABLE harvested_item
 
 CREATE INDEX harvested_item_fk_idx ON harvested_item(item_id);
 
--------------------------------------------------------
--- Create the submission-process tables
--------------------------------------------------------
--- list of the submission-processes,steps and actions
--- list of roles
-
--- Table: submissionprocess
-
-CREATE TABLE submissionprocess
-(
-  process_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionprocess_seq'),
-  name VARCHAR(64),
-  start_step_id INTEGER
-);
-
-CREATE TABLE submissionstep
-(
-  step_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionstep_seq'),
-  next_step_id INTEGER,
-  name VARCHAR(64),
-  selection_method_id INTEGER,
-  role_id INTEGER
-);
-
-CREATE TABLE role
-(
- role_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('role_seq'),
- name VARCHAR(64),
- description VARCHAR(256),
- scope INTEGER
-);
-
-CREATE TABLE step2submissionprocess
-(
-  id        INTEGER PRIMARY KEY,
-  step_id   INTEGER REFERENCES submissionstep(step_id),
-  process_id INTEGER REFERENCES submissionprocess(process_id),
-  place INTEGER
-);
-
-
-CREATE TABLE submissionaction
-(
-  action_id INTEGER PRIMARY KEY DEFAULT NEXTVAL('submissionaction_seq'),
-  bean_id VARCHAR(64)
-);
-
-CREATE TABLE action2submissionstep
-(
-  id        INTEGER PRIMARY KEY,
-  step_id   INTEGER REFERENCES submissionstep(step_id),
-  action_id INTEGER REFERENCES submissionaction(action_id),
-  place INTEGER
-);
-
-CREATE TABLE outcome
-(
-  outcome_id	    INTEGER PRIMARY KEY,
-  status    INTEGER 
-); 	 
-
-CREATE TABLE step2outcome
-(
-	id        INTEGER PRIMARY KEY,
-  	outcome_id INTEGER REFERENCES outcome(outcome_id),
-  	step_id   INTEGER REFERENCES submissionstep(step_id)
-);

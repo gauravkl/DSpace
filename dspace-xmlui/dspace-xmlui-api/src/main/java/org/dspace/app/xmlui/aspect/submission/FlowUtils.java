@@ -7,14 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.submission;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
@@ -23,20 +15,22 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.InProgressSubmission;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * This is a utility class to aid in the submission flow scripts. 
@@ -75,6 +69,10 @@ public class FlowUtils {
 		if (type == 'S')
 		{
 			return WorkspaceItem.find(context, id);
+		}
+        if (type == 'C')
+		{
+			return WorkspaceService.find(context, id);
 		}
 		else if (type == 'W')
 		{
@@ -495,77 +493,4 @@ public class FlowUtils {
 		}
 
 	}
-    
-    /**
-     * Retrieves a list of all steps and pages within the
-     * current submission process.
-     * <P>
-     * This list may differ from the list of steps in the
-     * progress bar if the current submission process includes
-     * non-interactive steps which do not appear in the progress bar!
-     * <P>
-     * This method is used by the Manakin submission flowscript
-     * (submission.js) to step forward/backward between steps. 
-     * 
-     * @param request
-     *            The HTTP Servlet Request object
-     * @param subInfo
-     *            the current SubmissionInfo object
-     *  
-     */
-    public static StepAndPage[] getListOfAllSteps(HttpServletRequest request, SubmissionInfo subInfo)
-    {
-        ArrayList<StepAndPage> listStepNumbers = new ArrayList<StepAndPage>();
-
-        // loop through all steps
-        for (int i = 0; i < subInfo.getSubmissionConfig().getNumberOfSteps(); i++)
-        {
-            // get the current step info
-            SubmissionStepConfig currentStep = subInfo.getSubmissionConfig()
-                    .getStep(i);
-            int stepNumber = currentStep.getStepNumber();
-            
-            //Skip over the "Select Collection" step, since
-            // a user is never allowed to return to that step or jump from that step
-            if(currentStep.getId()!=null && currentStep.getId().equals(SubmissionStepConfig.SELECT_COLLECTION_STEP))
-            {
-                continue;
-            }
-            
-            // default to just one page in this step
-            int numPages = 1;
-
-            try
-            {
-                // load the processing class for this step
-                ClassLoader loader = subInfo.getClass().getClassLoader();
-                Class<?> stepClass = loader.loadClass(currentStep.getProcessingClassName());
-   
-                // call the "getNumberOfPages()" method of the class 
-                // to get it's number of pages
-                AbstractProcessingStep step = (AbstractProcessingStep) stepClass
-                        .newInstance();
-
-                // get number of pages from servlet
-                numPages = step.getNumberOfPages(request, subInfo);
-            }
-            catch (Exception e)
-            {
-                log.error("Error loading step information from Step Class '"
-                                + currentStep.getProcessingClassName()
-                                + "' Error:", e);
-            }
-
-            // save each of the step's pages to the progress bar
-            for (int j = 1; j <= numPages; j++)
-            {
-                StepAndPage stepAndPageNum = new StepAndPage(stepNumber,j);
-                
-                listStepNumbers.add(stepAndPageNum);
-            }// end for each page
-        }// end for each step
-
-        //convert into an array and return that
-        return listStepNumbers.toArray(new StepAndPage[listStepNumbers.size()]);
-    }
 }
