@@ -31,7 +31,7 @@ public class SubmissionProcessFactory {
 
     private static HashMap<String, SubmissionProcess> submissionProcessCache;
     private static String path = ConfigurationManager.getProperty("dspace.dir")+"/config/SubmissionProcess.xml";
-    private static String pathActions = ConfigurationManager.getProperty("dspace.dir")+"/config/submission-actions-xmlui.xml";
+    private static String pathActions = ConfigurationManager.getProperty("dspace.dir")+"/config/submission-actions.xml";
 
     //TODO: Depending on the role system, create one process object per collection
     public static SubmissionProcess getSubmissionProcess(Context context,Collection collection) throws Exception//, SubmissionProcessConfigurationException

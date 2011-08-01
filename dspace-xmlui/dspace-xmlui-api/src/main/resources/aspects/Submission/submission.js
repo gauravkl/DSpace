@@ -293,7 +293,7 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
     }
 
     do{
-        sendPageAndWait("handle/"+collectionHandle+"/submit_new/getTask",{"id":workspaceID,"process_id":submissionprocess.getID(),"step_id":step.getId(),"action_id":action.getId()});
+        sendPageAndWait("handle/"+collectionHandle+"/submit_new/getTask",{"workspace_item_id":workspaceID,"step_id":step.getId(),"bean_id":beanID);
 
 
             try{

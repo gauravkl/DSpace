@@ -19,6 +19,7 @@ import org.dspace.core.LogManager;
 import org.dspace.submission.SubmissionProcessFactory;
 import org.dspace.submission.state.SubmissionProcess;
 import org.dspace.submission.state.SubmissionStep;
+import org.dspace.submission.state.actions.SubmissionAction;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -46,14 +47,13 @@ public class SubmissionTransformer extends AbstractDSpaceTransformer {
         super.setup(resolver, objectModel, src, parameters);
         authorized = true;
         try {
-            String processID = parameters.getParameter("process_id");
             String stepID = parameters.getParameter("step_id");
             String actionID = parameters.getParameter("action_id");
             int workspaceID = parameters.getParameterAsInteger("workspace_item_id");
             WorkspaceService wi = WorkspaceService.find(context, workspaceID);
-            SubmissionProcess wf = SubmissionProcessFactory.getSubmissionProcess(context, wi.getCollection());
-
-            SubmissionStep step = wf.getStep(context,Integer.parseInt(stepID));
+            SubmissionProcess process = SubmissionProcessFactory.getSubmissionProcess(context, wi.getCollection());
+            String beanID = SubmissionAction.find(context,actionID)
+            SubmissionStep step = process.getStep(context,Integer.parseInt(stepID));
             xmluiActionUI = (AbstractXMLUIAction) SubmissionProcessXMLUIFactory.getActionInterface(actionID);
             authorized = step.getActionConfig(actionID).getProcessingAction().isAuthorized(context, ObjectModelHelper.getRequest(objectModel), wi);
 
