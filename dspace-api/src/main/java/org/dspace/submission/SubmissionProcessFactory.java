@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.transform.TransformerException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ public class SubmissionProcessFactory {
 
     private static HashMap<String, SubmissionProcess> submissionProcessCache;
     private static String path = ConfigurationManager.getProperty("dspace.dir")+"/config/SubmissionProcess.xml";
-    private static String pathActions = ConfigurationManager.getProperty("dspace.dir")+"/config/SubmissionProcess-actions.xml";
+    private static String pathActions = ConfigurationManager.getProperty("dspace.dir")+"/config/submission-actions-xmlui.xml";
 
     //TODO: Depending on the role system, create one process object per collection
     public static SubmissionProcess getSubmissionProcess(Context context,Collection collection) throws Exception//, SubmissionProcessConfigurationException
@@ -117,9 +118,9 @@ public class SubmissionProcessFactory {
 //        return config;
 //    }
 //
-    public static SubmissionActionConfig createSubmissionActionConfig(String actionID){
+    public static SubmissionActionConfig createSubmissionActionConfig(String beanID)throws SQLException{
         ApplicationContext applicationContext = new FileSystemXmlApplicationContext("file:" + pathActions);
-        SubmissionActionConfig config = (SubmissionActionConfig) applicationContext.getBean(actionID, SubmissionActionConfig.class);
+        SubmissionActionConfig config = (SubmissionActionConfig) applicationContext.getBean(beanID, SubmissionActionConfig.class);
         return config;
     }
 

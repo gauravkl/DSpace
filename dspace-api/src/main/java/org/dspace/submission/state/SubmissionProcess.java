@@ -63,8 +63,8 @@ public class SubmissionProcess {
         
     }
 
-	public SubmissionStep getFirstStep() {
-		return firstStep;
+	public SubmissionStep getFirstStep(Context context) throws SQLException{
+		return getSteps(context,process_id)[0];
 	}
 
 	public int getID(){
@@ -385,7 +385,7 @@ public class SubmissionProcess {
                // Get all the step2submissionprocess rows
                TableRowIterator tri = DatabaseManager.queryTable(context,"step2submissionprocess",
                        "SELECT * FROM step2submissionprocess WHERE process_id= ? " +
-                       " ORDER BY step_id",processID);
+                       " ORDER BY place",processID);
 
                try
                {

@@ -573,8 +573,7 @@ CREATE TABLE WorkspaceItem
   multiple_files    BOOL,
   -- How for the user has got in the submit process
   action_id INTEGER REFERENCES submissionaction(action_id),
-  step_id INTEGER REFERENCES submissionstep(step_id),
-  process_id INTEGER REFERENCES submissionprocess(process_id)
+  step_id INTEGER REFERENCES submissionstep(step_id)
 );
 
 CREATE INDEX workspace_item_fk_idx ON WorkspaceItem(item_id);

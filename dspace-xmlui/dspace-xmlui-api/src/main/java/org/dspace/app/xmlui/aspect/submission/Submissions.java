@@ -7,32 +7,22 @@
  */
 package org.dspace.app.xmlui.aspect.submission;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.*;
 import org.dspace.content.Item;
-import org.dspace.content.SupervisedItem;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * @author Scott Phillips
@@ -360,7 +350,7 @@ public class Submissions extends AbstractDSpaceTransformer
     {
     	
         // User's WorkflowItems
-    	WorkspaceItem[] unfinishedItems = WorkspaceItem.findByEPerson(context,context.getCurrentUser());
+    	WorkspaceService[] unfinishedItems = WorkspaceService.findByEPerson(context,context.getCurrentUser());
     	SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(context, context.getCurrentUser());
 
     	if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
@@ -414,14 +404,16 @@ public class Submissions extends AbstractDSpaceTransformer
         
         if (unfinishedItems.length > 0)
         {
-	        for (WorkspaceItem workspaceItem : unfinishedItems) 
+	        for (WorkspaceService workspaceItem : unfinishedItems)
 	        {
 	        	DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
 	        	EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
 	        	
 	        	int workspaceItemID = workspaceItem.getID();
+                int step_id = workspaceItem.getStepID();
+                int action_id = workspaceItem.getActionID();
 	        	String collectionUrl = contextPath + "/handle/" + workspaceItem.getCollection().getHandle();
-	        	String workspaceItemUrl = contextPath + "/submit?workspaceID=" + workspaceItemID;
+	        	String workspaceItemUrl = contextPath + "/submit?workspaceID=" + workspaceItemID+"&stepID="+step_id+"&actionID="+action_id;
 	        	String submitterName = submitterEPerson.getFullName();
 	        	String submitterEmail = submitterEPerson.getEmail();
 	        	String collectionName = workspaceItem.getCollection().getMetadata("name");
@@ -462,7 +454,7 @@ public class Submissions extends AbstractDSpaceTransformer
             header.addCell(null,Cell.ROLE_HEADER,0,5,null).addContent(T_s_head4);
         }
         
-        for (WorkspaceItem workspaceItem : supervisedItems) 
+        for (WorkspaceItem workspaceItem : supervisedItems)
         {
         	
         	DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);

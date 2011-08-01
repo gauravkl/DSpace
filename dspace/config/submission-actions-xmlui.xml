@@ -6,6 +6,5 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-    <bean id="{action.id}" class="{classpath}" scope="prototype"/>
-    <bean id="{action.id.2}" class="{classpath}" scope="prototype"/>
-</beans>
+    <bean id="license" class="LicenseActionXMLUI" scope="prototype"/>
+    </beans>

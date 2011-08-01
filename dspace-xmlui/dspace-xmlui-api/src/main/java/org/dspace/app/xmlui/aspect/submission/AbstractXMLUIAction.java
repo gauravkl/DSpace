@@ -149,15 +149,15 @@ public abstract class AbstractXMLUIAction  extends AbstractDSpaceTransformer
 	public void addPageMeta(PageMeta pageMeta) throws SAXException,
 			WingException, UIException, SQLException, IOException,
 			AuthorizeException {
-		super.addPageMeta(pageMeta);
-
-		pageMeta.addMetadata("title").addContent(T_workflow_title);
-
-		Collection collection = workspaceItem.getCollection();
-
-		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-		HandleUtil.buildHandleTrail(collection, pageMeta, contextPath);
-		pageMeta.addTrail().addContent(T_workflow_trail);
+//		super.addPageMeta(pageMeta);
+//
+//		pageMeta.addMetadata("title").addContent(T_workflow_title);
+//
+//		Collection collection = workspaceItem.getCollection();
+//
+//		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+//		HandleUtil.buildHandleTrail(collection, pageMeta, contextPath);
+//		pageMeta.addTrail().addContent(T_workflow_trail);
 
 	}
 

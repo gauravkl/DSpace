@@ -33,7 +33,7 @@ public class SubmissionStep {
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionStep.class);
     private UserSelectionActionConfig userSelectionMethod;
-    private HashMap<String, SubmissionActionConfig> actionConfigsMap;
+    private HashMap<String, SubmissionActionConfig> actionConfigsMap =  new HashMap<String, SubmissionActionConfig>();;
     private List<String> actionConfigsList;
     private Map<Integer, Integer> outcomes = new HashMap<Integer, Integer>();
     private int step_id;
@@ -47,7 +47,6 @@ public class SubmissionStep {
     private static HashMap id2step = null;
 
     public SubmissionStep(String name , Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, Integer> outcomes){
-        this.actionConfigsMap = new HashMap<String, SubmissionActionConfig>();
         this.outcomes = outcomes;
         this.userSelectionMethod = userSelectionMethod;
         this.role = role;
@@ -75,15 +74,15 @@ public class SubmissionStep {
         
     }
     
-    public SubmissionActionConfig getActionConfig(String actionID) {
-        if(actionConfigsMap.get(actionID)!=null){
-            return actionConfigsMap.get(actionID);
+    public SubmissionActionConfig getActionConfig(String beanID) throws SQLException {
+        if(actionConfigsMap.get(beanID)!=null){
+            return actionConfigsMap.get(beanID);
         }
         else{
-            SubmissionActionConfig action = SubmissionProcessFactory.createSubmissionActionConfig(actionID);
-            action.setStep(this);
-            actionConfigsMap.put(actionID, action);
-            return action;
+            SubmissionActionConfig actionconfig = SubmissionProcessFactory.createSubmissionActionConfig(beanID);
+            actionconfig.setStep(this);
+            actionConfigsMap.put(beanID, actionconfig);
+            return actionconfig;
         }
     }
 
@@ -91,7 +90,7 @@ public class SubmissionStep {
      * Boolean that returns whether or not the actions in this step have a ui
      * @return a boolean
      */
-    public boolean hasUI(){
+    public boolean hasUI() throws SQLException{
         for (String actionConfigId : actionConfigsList) {
             SubmissionActionConfig actionConfig = getActionConfig(actionConfigId);
             if (actionConfig.hasUserInterface()) {
@@ -122,7 +121,7 @@ public class SubmissionStep {
             return userSelectionMethod;
     }
 
-    public SubmissionActionConfig getNextAction(SubmissionActionConfig currentAction) {
+    public SubmissionActionConfig getNextAction(SubmissionActionConfig currentAction) throws SQLException{
         int index = actionConfigsList.indexOf(currentAction.getId());
         if(index < actionConfigsList.size()-1){
             return getActionConfig(actionConfigsList.get(index+1));
@@ -507,6 +506,11 @@ public class SubmissionStep {
 	        SubmissionAction[] typeArray = new SubmissionAction[actions.size()];
 	        return (SubmissionAction[]) actions.toArray(typeArray);
 	    }
+
+        public SubmissionAction getFirstAction(Context context) throws SQLException
+        {
+           return getActions(context,step_id)[0];
+        }
 
 		public SubmissionProcess getProcess(Context context)
 	            throws SQLException

@@ -7,13 +7,13 @@
                            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
     <!-- At the top are our bean class identifiers --->
-    <bean id="describe" class="DescribeAction" scope="prototype"/>
+    <bean id="license" class="LicenseAction" scope="prototype"/>
   
  <!-- Below the class identifiers come the declarations for out actions/userSelectionMethods -->
 
  <!-- Use class workflowActionConfig for an action -->
- <bean id="describe" class="org.dspace.workflow.actions.WorkflowActionConfig">
-     <constructor-arg type="java.lang.String" value="describe"/>
+ <bean id="license" class="org.dspace.workflow.actions.WorkflowActionConfig">
+     <constructor-arg type="java.lang.String" value="license"/>
 
      <property name="processingAction" ref="{action.api.id}"/>
      <property name="requiresUI" value="{true}"/>

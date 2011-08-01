@@ -19,6 +19,8 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.submission.state.SubmissionProcess;
+import org.dspace.submission.state.SubmissionStep;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -56,6 +58,7 @@ public class WorkspaceService implements InProgressSubmission
      * @param row
      *            the database row
      */
+
     WorkspaceService(Context context, TableRow row) throws SQLException
     {
         ourContext = context;
@@ -150,7 +153,7 @@ public class WorkspaceService implements InProgressSubmission
         Group step3group = coll.getWorkflowGroup(3);
 
         EPerson e = c.getCurrentUser();
-
+        SubmissionProcess process = coll.getSubmissionProcess(c);
         // read permission
         AuthorizeManager.addPolicy(c, i, Constants.READ, e);
 
@@ -241,14 +244,15 @@ public class WorkspaceService implements InProgressSubmission
 
         // Create the workspace item row
         TableRow row = DatabaseManager.row("workspaceitem");
-
+        SubmissionStep step = process.getFirstStep(c);
         row.setColumn("item_id", i.getID());
         row.setColumn("collection_id", coll.getID());
-
+        row.setColumn("step_id", step.getId());
+        row.setColumn("action_id", step.getFirstAction(c).getId());
         log.info(LogManager.getHeader(c, "create_workspace_item",
                 "workspace_item_id=" + row.getIntColumn("workspace_item_id")
                         + "item_id=" + i.getID() + "collection_id="
-                        + coll.getID()));
+                        + coll.getID()+"step_id="+step.getId()));
 
         DatabaseManager.insert(c, row);
 
@@ -653,5 +657,23 @@ public class WorkspaceService implements InProgressSubmission
     public void setPublishedBefore(boolean b)
     {
         wiRow.setColumn("published_before", b);
+    }
+     public int getStepID()
+    {
+        return wiRow.getIntColumn("step_id");
+    }
+
+    public void setStepID(int step_id)
+    {
+        wiRow.setColumn("step_id", step_id);
+    }
+      public int getActionID()
+    {
+        return wiRow.getIntColumn("action_id");
+    }
+
+    public void setActionID(int action_id)
+    {
+        wiRow.setColumn("action_id", action_id);
     }
 }
