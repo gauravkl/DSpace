@@ -1,13 +1,14 @@
 package org.dspace.submission.state.actions.processingaction;
 
-import org.dspace.submission.state.actions.SubmissionAction;
+import org.dspace.submission.state.actions.SubmissionActionConfig;
 
 /**
  * User: kevin (kevin at atmire.com)
  * Date: 13-aug-2010
  * Time: 14:43:18
  */
-public abstract class ProcessingAction extends SubmissionAction {
+public abstract class ProcessingAction extends SubmissionActionConfig {
+
 
 //    @Override
 //    public boolean isAuthorized(Context context, HttpServletRequest request, WorkspaceItem wfi) throws SQLException {

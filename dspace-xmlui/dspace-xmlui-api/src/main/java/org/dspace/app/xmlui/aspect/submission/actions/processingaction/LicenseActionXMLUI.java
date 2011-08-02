@@ -117,7 +117,7 @@ public class LicenseActionXMLUI extends AbstractXMLUIAction
 		}
 		
 		//add standard control/paging buttons
-        //addControlButtons(controls);
+        addControlButtons(controls);
 	}
     
     /** 

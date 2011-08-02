@@ -279,9 +279,8 @@
           <map:match pattern="handle/*/*/submit_new/getTask">
               <map:transform type="SubmissionTransformer">
                 <map:parameter name="workspace_item_id" value="{flow-attribute:workspace_item_id}"/>
-                <map:parameter name="process_id" value="{flow-attribute:process_id}"/>
                 <map:parameter name="step_id" value="{flow-attribute:step_id}"/>
-                <map:parameter name="action_id" value="{flow-attribute:action_id}"/>
+                <map:parameter name="bean_id" value="{flow-attribute:bean_id}"/>
                 <!--<map:parameter name="showfull" value="{flow-attribute:showfull}"/>-->
               </map:transform>
             </map:match>

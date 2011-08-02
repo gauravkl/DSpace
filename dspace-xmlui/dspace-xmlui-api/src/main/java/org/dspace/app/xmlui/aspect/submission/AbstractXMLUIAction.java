@@ -7,15 +7,17 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.WorkspaceService;
 import org.dspace.submission.state.actions.ActionInterface;
+import org.dspace.submission.state.actions.SubmissionActionConfig;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -43,6 +45,14 @@ public abstract class AbstractXMLUIAction  extends AbstractDSpaceTransformer
 	protected static final Message T_workflow_trail = message("xmlui.Submission.general.workflow.trail");
 
 	protected static final Message T_workflow_head = message("xmlui.Submission.general.workflow.head");
+    protected static final Message T_previous =
+        message("xmlui.Submission.general.submission.previous");
+    protected static final Message T_save =
+        message("xmlui.Submission.general.submission.save");
+    protected static final Message T_next =
+        message("xmlui.Submission.general.submission.next");
+    protected static final Message T_complete =
+        message("xmlui.Submission.general.submission.complete");
 
 	/**
 	 * The current DSpace SubmissionInfo
@@ -102,7 +112,7 @@ public abstract class AbstractXMLUIAction  extends AbstractDSpaceTransformer
 		super.setup(resolver,objectModel,src,parameters);
 
 		try {
-			this.id = parameters.getParameter("id",null);
+			this.id = parameters.getParameter("workspace_item_id",null);
 			log.debug("AbstractStep.setup:  step is " + parameters.getParameter("step","]defaulted[")); // FIXME mhw
 			this.handle = parameters.getParameter("handle",null);
 			//this.errorFlag = Integer.valueOf(parameters.getParameter("error", String.valueOf(AbstractProcessingStep.STATUS_COMPLETE)));
@@ -222,4 +232,29 @@ public abstract class AbstractXMLUIAction  extends AbstractDSpaceTransformer
 		}
 
 	}
+
+     public void addControlButtons(List controls)
+        throws WingException
+    {
+        org.dspace.app.xmlui.wing.element.Item actions = controls.addItem();
+
+        //only have "<-Previous" button if not first step
+        //if(!isFirstStep())
+        //{
+            actions.addButton(SubmissionActionConfig.PREVIOUS_BUTTON).setValue(T_previous);
+        //}
+
+        //always show "Save/Cancel"
+        actions.addButton(SubmissionActionConfig.CANCEL_BUTTON).setValue(T_save);
+
+        //If last step, show "Complete Submission"
+        //if(isLastStep())
+        //{
+            actions.addButton(SubmissionActionConfig.NEXT_BUTTON).setValue(T_complete);
+        //}
+        //else //otherwise, show "Next->"
+        //{
+            actions.addButton(SubmissionActionConfig.NEXT_BUTTON).setValue(T_next);
+        //}
+    }
 }

@@ -283,7 +283,7 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
     cocoon.log.debug("stepID"+stepID);
     cocoon.log.debug("actionID"+actionID);
     var beanID = SubmissionAction.find(getDSContext(),actionID).getBean_id();
-    var action = step.getActionConfig(beanID);
+    //var action = step.getActionConfig(beanID);
 
     if (workspaceID == null)
     {
@@ -293,7 +293,7 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
     }
 
     do{
-        sendPageAndWait("handle/"+collectionHandle+"/submit_new/getTask",{"workspace_item_id":workspaceID,"step_id":step.getId(),"bean_id":beanID);
+        sendPageAndWait("handle/"+collectionHandle+"/submit_new/getTask",{"workspace_item_id":workspaceID,"step_id":step.getId(),"bean_id":beanID});
 
 
             try{

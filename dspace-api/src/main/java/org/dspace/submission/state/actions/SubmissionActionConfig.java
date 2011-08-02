@@ -19,8 +19,22 @@ public class SubmissionActionConfig {
     //TODO
 //    private String name = this.toString();
     private boolean requiresUI;
+    public static final String PREVIOUS_BUTTON = "submit_prev";
+
+       /***************************************************************************
+        * Constant - Name of the "Next->" button
+        **************************************************************************/
+       public static final String NEXT_BUTTON = "submit_next";
+
+       /***************************************************************************
+        * Constant - Name of the "Cancel/Save" button
+        **************************************************************************/
+       public static final String CANCEL_BUTTON = "submit_cancel";
 
 
+    public SubmissionActionConfig(){
+
+    }
 
     public SubmissionActionConfig(String id){
         this.id = id;

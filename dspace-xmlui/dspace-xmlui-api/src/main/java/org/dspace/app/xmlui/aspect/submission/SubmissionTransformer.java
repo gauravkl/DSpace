@@ -2,7 +2,6 @@ package org.dspace.app.xmlui.aspect.submission;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -15,11 +14,9 @@ import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceService;
 import org.dspace.core.LogManager;
-
 import org.dspace.submission.SubmissionProcessFactory;
 import org.dspace.submission.state.SubmissionProcess;
 import org.dspace.submission.state.SubmissionStep;
-import org.dspace.submission.state.actions.SubmissionAction;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -48,14 +45,13 @@ public class SubmissionTransformer extends AbstractDSpaceTransformer {
         authorized = true;
         try {
             String stepID = parameters.getParameter("step_id");
-            String actionID = parameters.getParameter("action_id");
-            int workspaceID = parameters.getParameterAsInteger("workspace_item_id");
+            String beanID = parameters.getParameter("bean_id");
+            int workspaceID = Integer.valueOf(parameters.getParameter("workspace_item_id").substring(1));
             WorkspaceService wi = WorkspaceService.find(context, workspaceID);
             SubmissionProcess process = SubmissionProcessFactory.getSubmissionProcess(context, wi.getCollection());
-            String beanID = SubmissionAction.find(context,actionID)
             SubmissionStep step = process.getStep(context,Integer.parseInt(stepID));
-            xmluiActionUI = (AbstractXMLUIAction) SubmissionProcessXMLUIFactory.getActionInterface(actionID);
-            authorized = step.getActionConfig(actionID).getProcessingAction().isAuthorized(context, ObjectModelHelper.getRequest(objectModel), wi);
+            xmluiActionUI = (AbstractXMLUIAction) SubmissionProcessXMLUIFactory.getActionInterface(beanID);
+            //authorized = step.getActionConfig(beanID).getProcessingAction().isAuthorized(context, ObjectModelHelper.getRequest(objectModel), wi);
 
             if(xmluiActionUI != null)
                 xmluiActionUI.setup(resolver, objectModel, src, parameters);
