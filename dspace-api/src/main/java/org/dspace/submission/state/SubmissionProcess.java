@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
-import org.dspace.content.WorkspaceService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -98,19 +97,14 @@ public class SubmissionProcess {
         return SubmissionStep.find(context,stepID);
 	}
 
-	public SubmissionStep getNextStep(Context context, WorkspaceService wfi, SubmissionStep currentStep, int outcome) throws IOException,// WorkflowConfigurationException, WorkflowException,
+	public SubmissionStep getNextStep(Context context, SubmissionStep currentStep, int outcome) throws IOException,// WorkflowConfigurationException, WorkflowException,
             SQLException {
 		Integer nextStepID = currentStep.getNextStepID(outcome);
 		if(nextStepID != null){
 			SubmissionStep nextStep = getStep(context,nextStepID);
 //			if(nextStep == null)
 //				throw new WorkflowException("Error while processing outcome, the following action was undefined: " + nextStepID);
-			if(nextStep.isValidStep(context, wfi)){
 				return nextStep;
-			} else {
-				return getNextStep(context, wfi, nextStep, 0);
-			}
-
 		}else{
 			//No next step, archive it
 			return null;

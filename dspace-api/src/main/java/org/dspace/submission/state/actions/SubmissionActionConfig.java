@@ -31,6 +31,8 @@ public class SubmissionActionConfig {
         **************************************************************************/
        public static final String CANCEL_BUTTON = "submit_cancel";
 
+     public static final int STATUS_COMPLETE = 0;
+
 
     public SubmissionActionConfig(){
 

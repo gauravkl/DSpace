@@ -1,6 +1,7 @@
 package org.dspace.submission.state.actions;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.WorkspaceService;
@@ -10,9 +11,10 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.submission.RoleMembers;
-import org.dspace.submission.state.SubmissionStep;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,7 +60,8 @@ public class SubmissionAction {
      {
      }
 
-      public ActionResult execute(Context c, WorkspaceService wfi, SubmissionStep step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException// WorkflowException;
+      public ActionResult execute(Context context, HttpServletRequest request,
+             SubmissionInfo subInfo) throws SQLException, AuthorizeException, IOException,ServletException// WorkflowException;
       {
         return null;
       }

@@ -1,6 +1,7 @@
 package org.dspace.submission;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
@@ -14,6 +15,7 @@ import org.dspace.submission.state.actions.SubmissionAction;
 import org.dspace.submission.state.actions.SubmissionActionConfig;
 
 import javax.mail.MessagingException;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -82,27 +84,28 @@ public class SubmissionManager {
     /*
      * Executes an action and returns the next.
      */
-    public static SubmissionActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId, SubmissionProcess process, SubmissionActionConfig currentActionConfig) throws Exception,SQLException, AuthorizeException, IOException, MessagingException//, WorkflowConfigurationException, WorkflowException
+    public static SubmissionActionConfig doState(Context c, EPerson user, HttpServletRequest request, String workspaceItemId, SubmissionProcess process, SubmissionActionConfig currentActionConfig) throws Exception,SQLException, AuthorizeException, IOException, MessagingException//, WorkflowConfigurationException, WorkflowException
     {
         try {
-            WorkspaceService wi = WorkspaceService.find(c, workflowItemId);
+            WorkspaceService wi = WorkspaceService.find(c, Integer.valueOf(workspaceItemId.substring(1)));
+            SubmissionInfo subInfo = SubmissionInfo.load(request,wi);
             SubmissionStep currentStep = currentActionConfig.getStep();
             //TODO: maybe we need a check to see whether a claimaction still exists for the action the user wants to execute?
             if(currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)){
-                ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
-                return processOutcome(c, user, process, currentStep, currentActionConfig, outcome, wi, false);
+                ActionResult outcome = currentActionConfig.getProcessingAction().execute(c,request,subInfo);
+                return processOutcome(c, user,request, process, currentStep, currentActionConfig, outcome, subInfo, false);
             }else{
                 throw new AuthorizeException("You are not allowed to to perform this task.");
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "error while executing state", "process:  " + process.getID() + " action: " + currentActionConfig.getId() + " workflowItemId: " + workflowItemId), e);
+            log.error(LogManager.getHeader(c, "error while executing state", "process:  " + process.getID() + " action: " + currentActionConfig.getId() + " workspaceItemId: " + workspaceItemId), e);
             //WorkflowUtils.sendAlert(request, e);
             throw e;
         }
     }
 
 
-    public static SubmissionActionConfig processOutcome(Context c, EPerson user, SubmissionProcess process, SubmissionStep currentStep, SubmissionActionConfig currentActionConfig, ActionResult currentOutcome, WorkspaceService wfi, boolean enteredNewStep) throws IOException,  AuthorizeException, SQLException//,WorkflowConfigurationException, WorkflowException
+    public static SubmissionActionConfig processOutcome(Context c, EPerson user,HttpServletRequest request, SubmissionProcess process, SubmissionStep currentStep, SubmissionActionConfig currentActionConfig, ActionResult currentOutcome,SubmissionInfo subInfo, boolean enteredNewStep) throws IOException,  AuthorizeException, SQLException,ServletException//,WorkflowConfigurationException, WorkflowException
     {
         if(currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE || currentOutcome.getType() == ActionResult.TYPE.TYPE_ERROR){
             //Our outcome is a page or an error, so return our current action
@@ -121,7 +124,7 @@ public class SubmissionManager {
             }
 
             if (nextActionConfig != null) {
-                nextActionConfig.getProcessingAction().activate(c, wfi);
+                //nextActionConfig.getProcessingAction().activate(c, wfi);
                 if (nextActionConfig.hasUserInterface() && !enteredNewStep) {
                     //TODO: if user is null, then throw a decent exception !
                     //createOwnedTask(c, wfi, currentStep, nextActionConfig, user);
@@ -130,8 +133,8 @@ public class SubmissionManager {
                     //We have entered a new step and have encountered a UI, return null since the current user doesn't have anything to do with this
                     return null;
                 } else {
-                    ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, currentStep, null);
-                    return processOutcome(c, user, process, currentStep, nextActionConfig, newOutcome, wfi, enteredNewStep);
+                    ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, request,subInfo);
+                    return processOutcome(c, user,request, process, currentStep, nextActionConfig, newOutcome, subInfo, enteredNewStep);
                 }
             }else{
 
@@ -146,13 +149,13 @@ public class SubmissionManager {
                     //SubmissionManager.deleteAllTasks(c, wfi);
 
 
-                    SubmissionStep nextStep = process.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
+                    SubmissionStep nextStep = process.getNextStep(c, currentStep, currentOutcome.getResult());
 
                     if(nextStep!=null){
                         //TODO: is generate tasks nog nodig of kan dit mee in activate?
                         //TODO: vorige step zou meegegeven moeten worden om evt rollen te kunnen overnemen
                         nextActionConfig = nextStep.getUserSelectionMethod();
-                        nextActionConfig.getProcessingAction().activate(c, wfi);
+                        //nextActionConfig.getProcessingAction().activate(c, wfi);
         //                nextActionConfig.getProcessingAction().generateTasks();
 
                         //TODO VERTALEN Deze kunnen afhangen van de step (rol, min, max, ...). Evt verantwoordelijkheid bij userassignmentaction leggen
@@ -161,9 +164,9 @@ public class SubmissionManager {
                             c.restoreAuthSystemState();
                             return null;
                         } else {
-                            ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, nextStep, null);
+                            ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, request,subInfo);
                             c.restoreAuthSystemState();
-                            return processOutcome(c, user, process, nextStep, nextActionConfig, newOutcome, wfi, true);
+                            return processOutcome(c, user,request, process, nextStep, nextActionConfig, newOutcome, subInfo, true);
                         }
                     }else{
                         if(currentOutcome.getResult() != ActionResult.OUTCOME_COMPLETE){

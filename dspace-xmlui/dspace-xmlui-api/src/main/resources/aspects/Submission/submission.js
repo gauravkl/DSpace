@@ -31,6 +31,7 @@ importClass(Packages.org.dspace.app.util.SubmissionInfo);
 
 importClass(Packages.org.dspace.submit.AbstractProcessingStep);
 
+importClass(Packages.org.dspace.submission.SubmissionManager);
 importClass(Packages.org.dspace.submission.SubmissionProcessFactory);
 importClass(Packages.org.dspace.submission.state.actions.SubmissionAction);
 
@@ -280,10 +281,8 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
     var coll = Collection(HandleManager.resolveToObject(getDSContext(), collectionHandle));
     var submissionprocess = SubmissionProcessFactory.getSubmissionProcess(getDSContext(),coll);
     var step = submissionprocess.getStep(getDSContext(),stepID);
-    cocoon.log.debug("stepID"+stepID);
-    cocoon.log.debug("actionID"+actionID);
     var beanID = SubmissionAction.find(getDSContext(),actionID).getBean_id();
-    //var action = step.getActionConfig(beanID);
+    var action = step.getActionConfig(beanID);
 
     if (workspaceID == null)
     {
@@ -299,7 +298,7 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
             try{
                 action = SubmissionManager.doState(getDSContext(), getDSContext().getCurrentUser(), getHttpRequest(), workspaceID, submissionprocess, action);
             }catch(exception){
-                sendPage("handle/"+handle+"/workflow_new/workflowexception",{"error":exception.toString()});
+                sendPage("handle/"+collectionHandle+"/submit_new/submitexception",{"error":exception.toString()});
                 cocoon.exit();
             }
             if(action == null){

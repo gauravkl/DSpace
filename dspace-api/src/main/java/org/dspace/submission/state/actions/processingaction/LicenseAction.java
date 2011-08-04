@@ -8,6 +8,21 @@
 package org.dspace.submission.state.actions.processingaction;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.Util;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
+import org.dspace.submission.state.actions.ActionResult;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * License step for DSpace Submission Process. Processes the
@@ -64,67 +79,67 @@ public class LicenseAction extends ProcessingAction
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-//    public int doProcessing(Context context, HttpServletRequest request,
-//            HttpServletResponse response, SubmissionInfo subInfo)
-//            throws ServletException, IOException, SQLException,
-//            AuthorizeException
-//    {
-//        String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
-//
-//        boolean licenseGranted = false;
-//
-//        // For Manakin:
-//        // Accepting the license means checking a box and clicking Next
-//        String decision = request.getParameter("decision");
-//        if (decision != null && decision.equalsIgnoreCase("accept")
-//                && buttonPressed.equals(NEXT_BUTTON))
-//        {
-//            licenseGranted = true;
-//        }
-//        // For JSP-UI: User just needed to click "I Accept" button
-//        else if (buttonPressed.equals("submit_grant"))
-//        {
-//            licenseGranted = true;
-//        }// JSP-UI: License was explicitly rejected
-//        else if (buttonPressed.equals("submit_reject"))
-//        {
-//            licenseGranted = false;
-//        }// Manakin UI: user didn't make a decision and clicked Next->
-//        else if (buttonPressed.equals(NEXT_BUTTON))
-//        {
-//            // no decision made (this will cause Manakin to display an error)
-//            return STATUS_LICENSE_REJECTED;
-//        }
-//
-//        if (licenseGranted
-//                && (buttonPressed.equals("submit_grant") || buttonPressed
-//                        .equals(NEXT_BUTTON)))
-//        {
-//            // License granted
-//            log.info(LogManager.getHeader(context, "accept_license",
-//                    subInfo.getSubmissionLogInfo()));
-//
-//            // Add the license to the item
-//            Item item = subInfo.getSubmissionItem().getItem();
-//            EPerson submitter = context.getCurrentUser();
-//
-//            // remove any existing DSpace license (just in case the user
-//            // accepted it previously)
-//            item.removeDSpaceLicense();
-//
-//            String license = LicenseUtils.getLicenseText(context
-//                    .getCurrentLocale(), subInfo.getSubmissionItem()
-//                    .getCollection(), item, submitter);
-//
-//            LicenseUtils.grantLicense(context, item, license);
-//
-//            // commit changes
-//            context.commit();
-//        }
-//
-//        // completed without errors
-//        return STATUS_COMPLETE;
-//    }
+  public ActionResult execute(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
+    {
+        String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
+
+        boolean licenseGranted = false;
+
+        // For Manakin:
+        // Accepting the license means checking a box and clicking Next
+        String decision = request.getParameter("decision");
+        if (decision != null && decision.equalsIgnoreCase("accept")
+                && buttonPressed.equals(NEXT_BUTTON))
+        {
+            licenseGranted = true;
+        }
+        // For JSP-UI: User just needed to click "I Accept" button
+        else if (buttonPressed.equals("submit_grant"))
+        {
+            licenseGranted = true;
+        }// JSP-UI: License was explicitly rejected
+        else if (buttonPressed.equals("submit_reject"))
+        {
+            licenseGranted = false;
+        }// Manakin UI: user didn't make a decision and clicked Next->
+        else if (buttonPressed.equals(NEXT_BUTTON))
+        {
+            // no decision made (this will cause Manakin to display an error)
+            //return STATUS_LICENSE_REJECTED;
+        }
+
+        if (licenseGranted
+                && (buttonPressed.equals("submit_grant") || buttonPressed
+                        .equals(NEXT_BUTTON)))
+        {
+            // License granted
+            log.info(LogManager.getHeader(context, "accept_license",
+                    subInfo.getSubmissionLogInfo()));
+
+            // Add the license to the item
+            Item item = subInfo.getSubmissionItem().getItem();
+            EPerson submitter = context.getCurrentUser();
+
+            // remove any existing DSpace license (just in case the user
+            // accepted it previously)
+            item.removeDSpaceLicense();
+
+            String license = LicenseUtils.getLicenseText(context
+                    .getCurrentLocale(), subInfo.getSubmissionItem()
+                    .getCollection(), item, submitter);
+
+            LicenseUtils.grantLicense(context, item, license);
+
+            // commit changes
+            context.commit();
+        }
+
+        // completed without errors
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME,ActionResult.OUTCOME_COMPLETE);
+    }
 
 
     /**
@@ -149,11 +164,11 @@ public class LicenseAction extends ProcessingAction
      * 
      * @return the number of pages in this step
      */
-//    public int getNumberOfPages(HttpServletRequest request,
-//            SubmissionInfo subInfo) throws ServletException
-//    {
-//        return 1;
-//
-//    }
+    public int getNumberOfPages(HttpServletRequest request,
+            SubmissionInfo subInfo) throws ServletException
+    {
+        return 1;
+
+    }
 
 }

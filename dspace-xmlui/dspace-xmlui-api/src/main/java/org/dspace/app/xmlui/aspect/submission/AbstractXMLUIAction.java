@@ -22,6 +22,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -115,8 +117,8 @@ public abstract class AbstractXMLUIAction  extends AbstractDSpaceTransformer
 			this.id = parameters.getParameter("workspace_item_id",null);
 			log.debug("AbstractStep.setup:  step is " + parameters.getParameter("step","]defaulted[")); // FIXME mhw
 			this.handle = parameters.getParameter("handle",null);
-			//this.errorFlag = Integer.valueOf(parameters.getParameter("error", String.valueOf(AbstractProcessingStep.STATUS_COMPLETE)));
-			//this.errorFields = getErrorFields(parameters);
+			this.errorFlag = Integer.valueOf(parameters.getParameter("error", String.valueOf(SubmissionActionConfig.STATUS_COMPLETE)));
+			this.errorFields = getErrorFields(parameters);
 
 
 			//load in-progress submission
@@ -257,4 +259,24 @@ public abstract class AbstractXMLUIAction  extends AbstractDSpaceTransformer
             actions.addButton(SubmissionActionConfig.NEXT_BUTTON).setValue(T_next);
         //}
     }
+    public java.util.List<String> getErrorFields(Parameters parameters)
+	{
+		java.util.List<String> fields = new ArrayList<String>();
+
+		String errors = parameters.getParameter("error_fields","");
+
+		if (errors!=null && errors.length() > 0)
+		{
+			if(errors.indexOf(',') > 0)
+            {
+                fields = Arrays.asList(errors.split(","));
+            }
+			else//only one error field
+            {
+                fields.add(errors);
+            }
+		}
+
+		return fields;
+	}
 }
