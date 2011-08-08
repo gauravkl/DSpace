@@ -97,10 +97,10 @@ public class SubmissionProcess {
         return SubmissionStep.find(context,stepID);
 	}
 
-	public SubmissionStep getNextStep(Context context, SubmissionStep currentStep, int outcome) throws IOException,// WorkflowConfigurationException, WorkflowException,
+	public SubmissionStep getNextStep(Context context, SubmissionStep currentStep, int outcome) throws IOException,AuthorizeException,// WorkflowConfigurationException, WorkflowException,
             SQLException {
-		Integer nextStepID = currentStep.getNextStepID(outcome);
-		if(nextStepID != null){
+		Integer nextStepID = currentStep.getNextStepID(context,outcome);
+		if(nextStepID != -1){
 			SubmissionStep nextStep = getStep(context,nextStepID);
 //			if(nextStep == null)
 //				throw new WorkflowException("Error while processing outcome, the following action was undefined: " + nextStepID);
@@ -109,7 +109,6 @@ public class SubmissionProcess {
 			//No next step, archive it
 			return null;
 		}
-
 	}
 
 	public void setFirstStep(SubmissionStep firstStep) {

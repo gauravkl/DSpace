@@ -12,10 +12,8 @@ import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.LicenseUtils;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
+import org.dspace.license.CreativeCommons;
 import org.dspace.submission.state.actions.ActionResult;
 
 import javax.servlet.ServletException;
@@ -39,7 +37,7 @@ import java.sql.SQLException;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class LicenseAction extends ProcessingAction
+public class CCLicenseAction extends ProcessingAction
 {
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
@@ -52,7 +50,7 @@ public class LicenseAction extends ProcessingAction
     public static final int STATUS_LICENSE_REJECTED = 1;
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(LicenseAction.class);
+    private static Logger log = Logger.getLogger(CCLicenseAction.class);
 
 
     /**
@@ -78,60 +76,37 @@ public class LicenseAction extends ProcessingAction
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-  public ActionResult execute(Context context, HttpServletRequest request,
+   public ActionResult execute(Context context, HttpServletRequest request,
             SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
+        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
-        boolean licenseGranted = false;
+        // RLR hack - need to distinguish between progress bar real submission
+        // (if cc_license_url exists, then users has accepted the CC License)
+        String ccLicenseUrl = request.getParameter("cc_license_url");
 
-        // For Manakin:
-        // Accepting the license means checking a box and clicking Next
-        String decision = request.getParameter("decision");
-        if (decision != null && decision.equalsIgnoreCase("accept")
-                && buttonPressed.equals(NEXT_BUTTON))
+        if (buttonPressed.equals("submit_no_cc"))
         {
-            licenseGranted = true;
+            // Skipping the CC license - remove any existing license selection
+            CreativeCommons.removeLicense(context, subInfo.getSubmissionItem()
+                    .getItem());
         }
-        // Manakin UI: user didn't make a decision and clicked Next->
-        else if (buttonPressed.equals(NEXT_BUTTON))
+        else if ((ccLicenseUrl != null) && (ccLicenseUrl.length() > 0))
         {
-            // no decision made (this will cause Manakin to display an error)
-            //return STATUS_LICENSE_REJECTED;
-        }
-
-        if (licenseGranted
-                && (buttonPressed.equals("submit_grant") || buttonPressed
-                        .equals(NEXT_BUTTON)))
-        {
-            // License granted
-            log.info(LogManager.getHeader(context, "accept_license",
-                    subInfo.getSubmissionLogInfo()));
-
-            // Add the license to the item
             Item item = subInfo.getSubmissionItem().getItem();
-            EPerson submitter = context.getCurrentUser();
 
-            // remove any existing DSpace license (just in case the user
-            // accepted it previously)
-            item.removeDSpaceLicense();
-
-            String license = LicenseUtils.getLicenseText(context
-                    .getCurrentLocale(), subInfo.getSubmissionItem()
-                    .getCollection(), item, submitter);
-
-            LicenseUtils.grantLicense(context, item, license);
-
-            // commit changes
-            context.commit();
+            // save the CC license
+            CreativeCommons.setLicense(context, item, ccLicenseUrl);
         }
+
+        // commit changes
+        context.commit();
 
         // completed without errors
-        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME,ActionResult.OUTCOME_COMPLETE);
+        return  new ActionResult(ActionResult.TYPE.TYPE_OUTCOME,ActionResult.OUTCOME_COMPLETE); // no errors!
     }
-
 
     /**
      * Retrieves the number of pages that this "step" extends over. This method

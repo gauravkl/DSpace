@@ -120,7 +120,7 @@ public class SubmissionManager {
             //We have completed our action search & retrieve the next action
             SubmissionActionConfig nextActionConfig = null;
             if(currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE){
-                nextActionConfig = currentStep.getNextAction(currentActionConfig);
+                nextActionConfig = currentStep.getNextAction(c,currentActionConfig);
             }
 
             if (nextActionConfig != null) {

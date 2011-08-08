@@ -283,7 +283,8 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
     var step = submissionprocess.getStep(getDSContext(),stepID);
     var beanID = SubmissionAction.find(getDSContext(),actionID).getBean_id();
     var action = step.getActionConfig(beanID);
-
+    var submissionInfo = getSubmissionInfo(workspaceID);
+    var inWorkflow = submissionInfo.isInWorkflow();
     if (workspaceID == null)
     {
         throw "Unable to find submissionprocess, no submissionprocess id supplied.";
@@ -292,6 +293,8 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
     }
 
     do{
+        beanID = action.getId();
+        step = action.getStep();
         sendPageAndWait("handle/"+collectionHandle+"/submit_new/getTask",{"workspace_item_id":workspaceID,"step_id":step.getId(),"bean_id":beanID});
 
 
@@ -302,10 +305,22 @@ function submissionControl(collectionHandle, workspaceID, stepID,actionID)
                 cocoon.exit();
             }
             if(action == null){
-                var contextPath = cocoon.request.getContextPath();
-                cocoon.redirectTo(contextPath+"/submissions",true);
-                getDSContext().complete();
-                cocoon.exit();
+
+
+           	//check if we've completed the submission
+
+            if(inWorkflow==false)
+            {
+                //Submission is completed!
+                cocoon.log.debug("Submission Completed!");
+
+                showCompleteConfirmation(collectionHandle);
+            }
+            else
+            {   //since in Workflow just break out of loop to return to Workflow process
+                break;
+            }
+
             }
     }while(true);
 }

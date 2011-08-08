@@ -100,9 +100,18 @@ public class SubmissionStep {
         return false;
     }
 
-    public int getNextStepID(int outcome) //throws WorkflowException, IOException, WorkflowConfigurationException, SQLException
+    public int getNextStepID(Context context,int outcome) throws SQLException,AuthorizeException
     {
-        return outcomes.get(outcome);
+        if(outcomes.get(outcome)!=null){
+             return outcomes.get(outcome);
+        }else{
+            initOutcomes(context);
+            if(outcomes.get(outcome)!=null){
+                return outcomes.get(outcome);
+            }else{
+                return -1;
+            }
+        }
     }
 
 
@@ -121,7 +130,10 @@ public class SubmissionStep {
             return userSelectionMethod;
     }
 
-    public SubmissionActionConfig getNextAction(SubmissionActionConfig currentAction) throws SQLException{
+    public SubmissionActionConfig getNextAction(Context context,SubmissionActionConfig currentAction) throws SQLException{
+        if(actionConfigsList==null){
+            setStepActionConfigs(context);
+        }
         int index = actionConfigsList.indexOf(currentAction.getId());
         if(index < actionConfigsList.size()-1){
             return getActionConfig(actionConfigsList.get(index+1));
@@ -575,6 +587,29 @@ public class SubmissionStep {
 	       mappingRow.setColumn("step_id", step_id);
             mappingRow.setColumn("outcome_id", outcome);
 	        DatabaseManager.update(context, mappingRow);
+           }
+     public void initOutcomes(Context context) throws SQLException,
+           AuthorizeException
+           {
+           TableRowIterator tri = DatabaseManager.queryTable(context, "step2outcome",
+	                        "SELECT * FROM step2outcome ");
+
+	        try
+	        {
+
+	            while (tri.hasNext())
+	            {
+	               int step_id =tri.next().getIntColumn("step_id");
+                   int outcome = tri.next().getIntColumn("outcome_id");
+                   outcomes.put(outcome,step_id);
+	            }
+	        }
+	        finally
+	        {
+	            // close the TableRowIterator to free up resources
+	            if (tri != null)
+	                tri.close();
+	        }
            }
      private void setStepActionConfigs(Context context) throws SQLException{
         List<String> actionConfigIDs = new ArrayList<String>();

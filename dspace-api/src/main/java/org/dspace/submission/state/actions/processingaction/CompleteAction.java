@@ -9,13 +9,9 @@ package org.dspace.submission.state.actions.processingaction;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.LicenseUtils;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
 import org.dspace.submission.state.actions.ActionResult;
 
 import javax.servlet.ServletException;
@@ -24,13 +20,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * License step for DSpace Submission Process. Processes the
- * user response to the license.
+ * This is the class which defines what happens once a submission completes!
  * <P>
  * This class performs all the behind-the-scenes processing that
  * this particular step requires.  This class's methods are utilized 
  * by both the JSP-UI and the Manakin XML-UI
  * <P>
+ * This step is non-interactive (i.e. no user interface), and simply performs
+ * the processing that is necessary after a submission has been completed!
  * 
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
@@ -39,21 +36,10 @@ import java.sql.SQLException;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class LicenseAction extends ProcessingAction
+public class CompleteAction extends ProcessingAction
 {
-    /***************************************************************************
-     * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
-     * additional user interaction may be required)
-     * 
-     * (Do NOT use status of 0, since it corresponds to STATUS_COMPLETE flag
-     * defined in the JSPStepManager class)
-     **************************************************************************/
-    // user rejected the license
-    public static final int STATUS_LICENSE_REJECTED = 1;
-
     /** log4j logger */
-    private static Logger log = Logger.getLogger(LicenseAction.class);
-
+    private static Logger log = Logger.getLogger(CompleteAction.class);
 
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -78,60 +64,43 @@ public class LicenseAction extends ProcessingAction
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-  public ActionResult execute(Context context, HttpServletRequest request,
-            SubmissionInfo subInfo)
+    public ActionResult execute(Context context, HttpServletRequest request,
+           SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
+        // The Submission is COMPLETE!!
+        log.info(LogManager.getHeader(context, "submission_complete",
+                "Completed submission with id="
+                        + subInfo.getSubmissionItem().getID()));
 
-        boolean licenseGranted = false;
-
-        // For Manakin:
-        // Accepting the license means checking a box and clicking Next
-        String decision = request.getParameter("decision");
-        if (decision != null && decision.equalsIgnoreCase("accept")
-                && buttonPressed.equals(NEXT_BUTTON))
+        // Start the workflow for this Submission
+        boolean success = false;
+        try
         {
-            licenseGranted = true;
+        //WorkflowManager.start(context, (WorkspaceItem) subInfo
+        //        .getSubmissionItem());
+            success = true;
         }
-        // Manakin UI: user didn't make a decision and clicked Next->
-        else if (buttonPressed.equals(NEXT_BUTTON))
+        catch (Exception e)
         {
-            // no decision made (this will cause Manakin to display an error)
-            //return STATUS_LICENSE_REJECTED;
+            log.error("Caught exception in submission step: ",e);
+            throw new ServletException(e);
         }
-
-        if (licenseGranted
-                && (buttonPressed.equals("submit_grant") || buttonPressed
-                        .equals(NEXT_BUTTON)))
+        finally
         {
-            // License granted
-            log.info(LogManager.getHeader(context, "accept_license",
-                    subInfo.getSubmissionLogInfo()));
-
-            // Add the license to the item
-            Item item = subInfo.getSubmissionItem().getItem();
-            EPerson submitter = context.getCurrentUser();
-
-            // remove any existing DSpace license (just in case the user
-            // accepted it previously)
-            item.removeDSpaceLicense();
-
-            String license = LicenseUtils.getLicenseText(context
-                    .getCurrentLocale(), subInfo.getSubmissionItem()
-                    .getCollection(), item, submitter);
-
-            LicenseUtils.grantLicense(context, item, license);
-
-            // commit changes
-            context.commit();
+        // commit changes to database
+            if (success)
+            {
+                context.commit();
+            }
+            else
+            {
+                context.getDBConnection().rollback();
+            }
         }
-
-        // completed without errors
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME,ActionResult.OUTCOME_COMPLETE);
     }
-
 
     /**
      * Retrieves the number of pages that this "step" extends over. This method
@@ -158,8 +127,9 @@ public class LicenseAction extends ProcessingAction
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {
+        // This class represents the non-interactive processing step
+        // that occurs just *before* the final confirmation page!
+        // (so it should only be processed once!)
         return 1;
-
     }
-
 }
